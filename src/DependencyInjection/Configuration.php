@@ -1,0 +1,16 @@
+<?php
+
+namespace SamFreeze\SymfonyCrudBundle\DependencyInjection;
+
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
+
+class Configuration implements ConfigurationInterface
+{
+    public function getConfigTreeBuilder()
+    {
+        $treeBuilder = new TreeBuilder();
+        $treeBuilder->root('symfony_crud_check');
+        return $treeBuilder;
+    }
+}

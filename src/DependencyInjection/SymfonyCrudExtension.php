@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
 
-class HealthCheckExtension extends Extension
+class SymfonyCrudExtension extends Extension
 {
     /**
      * {@inheritdoc}
