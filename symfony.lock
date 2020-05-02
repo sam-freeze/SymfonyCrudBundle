@@ -98,11 +98,17 @@
     "symfony/mime": {
         "version": "v5.0.7"
     },
+    "symfony/polyfill-ctype": {
+        "version": "1.15-dev"
+    },
     "symfony/polyfill-intl-idn": {
         "version": "v1.15.0"
     },
     "symfony/polyfill-mbstring": {
         "version": "v1.15.0"
+    },
+    "symfony/polyfill-php72": {
+        "version": "1.15-dev"
     },
     "symfony/polyfill-php73": {
         "version": "v1.15.0"
