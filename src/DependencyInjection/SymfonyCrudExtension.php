@@ -1,6 +1,6 @@
 <?php
 
-namespace SamFreeze\Bundle\SymfonyCrudBundle\DependencyInjection;
+namespace SamFreeze\SymfonyCrudBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

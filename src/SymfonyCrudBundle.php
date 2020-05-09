@@ -1,7 +1,8 @@
 <?php
 
-namespace SamFreeze\Bundle\SymfonyCrudBundle;
+namespace SamFreeze\SymfonyCrudBundle;
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
