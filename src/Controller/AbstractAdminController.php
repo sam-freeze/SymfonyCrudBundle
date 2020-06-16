@@ -197,12 +197,7 @@ abstract class AbstractAdminController extends Controller {
 			$searchLabel = $column['name'];
 			$searchType = $column['searchType'];
 			$searchName = join('_', $attributes);
-			$searchOptions = [
-				'required' => false,
-				'attr' => [
-					'placeholder' => $searchLabel
-				]
-			];
+			$searchOptions = isset($column['searchOptions']) ? $column['searchOptions'] : [];
 		
 			switch ($searchType) {
 				case ChoiceType::class:
@@ -220,6 +215,11 @@ abstract class AbstractAdminController extends Controller {
 				default:
 					break;
 			}
+			
+			$searchOptions['required'] = false;
+			$searchOptions['attr'] = [
+				'placeholder' => $searchLabel
+			];
 		
 			$formBuilder->add(
 				$searchName,
