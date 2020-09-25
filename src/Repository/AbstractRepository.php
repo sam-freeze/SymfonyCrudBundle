@@ -2,6 +2,7 @@
 
 namespace SamFreeze\SymfonyCrudBundle\Repository;
 
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
@@ -45,8 +46,10 @@ abstract class AbstractRepository extends ServiceEntityRepository
 		);
 	}
 	
-	public function search($values, $orderBy) {
+	public function search($values, $orderBy, $pagination) {
 		$qb = $this->createQueryBuilder('p');
+		
+		$join = [];
 		
 		foreach ($values as $key => $value) {
 			if (is_null($value)) continue;
@@ -65,8 +68,9 @@ abstract class AbstractRepository extends ServiceEntityRepository
 						$qb->andWhere($qb->expr()->like("$parent.$child", ":$parent$child"))
 							->setParameter("$parent$child", "%$value%");
 					}
-				} else {
+				} else if (!in_array("$parent.$child=$child", $join)) {
 					$qb->leftJoin("$parent.$child", $child);
+					array_push($join, "$parent.$child=$child");
 				}
 				
 				$parent = $child;
@@ -86,15 +90,22 @@ abstract class AbstractRepository extends ServiceEntityRepository
 				
 				if ($i == $count - 1) {
 					$qb->addOrderBy("$parent.$child", $sort);
-				} else {
+				} else if (!in_array("$parent.$child=$child", $join)) {
 					$qb->leftJoin("$parent.$child", $child);
+					array_push($join, "$parent.$child=$child");
 				}
 				
 				$parent = $child;
 			}
 			
 		}
-	
-		return $qb->getQuery()->getResult();
+		
+		$paginator = new Paginator($qb);
+		$paginator
+			->getQuery()
+			->setFirstResult(($pagination['page'] - 1) * $pagination['limit'])
+			->setMaxResults($pagination['limit']);
+		
+		return $paginator;
 	}
 }

@@ -9,6 +9,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use SamFreeze\SymfonyCrudBundle\Repository\AbstractRepository;
 use SamFreeze\SymfonyCrudBundle\Repository\AbstractRouteSearchRepository;
 use SamFreeze\SymfonyCrudBundle\Repository\AbstractRouteSortRepository;
+use SamFreeze\SymfonyCrudBundle\Repository\AbstractRoutePaginationRepository;
 use SamFreeze\SymfonyCrudBundle\Service\FileUploader;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
@@ -27,9 +28,11 @@ abstract class AbstractAdminController extends Controller {
 		TranslatorInterface $translator,
     	AbstractRouteSearchRepository $routeSearchRepository,
 		AbstractRouteSortRepository $routeSortRepository,
+		AbstractRoutePaginationRepository $routePaginationRepository,
 		AbstractRepository $repository,
 		$routeSearchEntity,
 		$routeSortEntity,
+		$routePaginationEntity,
 		$entity,
 		$form,
 		$route,
@@ -37,10 +40,12 @@ abstract class AbstractAdminController extends Controller {
 	) {
 		$this->translator = $translator;
     	$this->routeSearchRepository = $routeSearchRepository;
-    	$this->routeSortRepository = $routeSortRepository;
+		$this->routeSortRepository = $routeSortRepository;
+		$this->routePaginationRepository = $routePaginationRepository;
     	$this->repository = $repository;
         $this->routeSearchEntity = $routeSearchEntity;
-        $this->routeSortEntity = $routeSortEntity;
+		$this->routeSortEntity = $routeSortEntity;
+		$this->routePaginationEntity = $routePaginationEntity;
 		$this->entity = $entity;
         $this->form = $form;
         $this->route = $route;
@@ -58,15 +63,25 @@ abstract class AbstractAdminController extends Controller {
     /**
      * @Route("/", name="index", methods="GET|POST")
      */
-    public function index(EntityManagerInterface $entityManager): Response
+    public function index(Request $request, EntityManagerInterface $entityManager): Response
     {
 		$searchData = $this->getData($this->routeSearchRepository);
 		$sortData = $this->getData($this->routeSortRepository);
+		$paginationData = $this->getData($this->routePaginationRepository);
+
+		if (!array_key_exists('page', $paginationData)) {
+			$paginationData['page'] = 1;
+		}
+
+		if (!array_key_exists('limit', $paginationData)) {
+			$paginationData['limit'] = 5;
+		}
     	
         $form = $this->generateSearchForm($searchData);
 
         return $this->render('abstract/index.html.twig', [
-            'items' => $this->repository->search($searchData, $sortData),
+            'items' => $this->repository->search($searchData, $sortData, $paginationData),
+            'pagination' => $paginationData,
             'columns' => $this->columns,
             'route' => $this->route,
             'title' => $this->getTitle(),
@@ -176,6 +191,37 @@ abstract class AbstractAdminController extends Controller {
 		$routeSort->setValue($order);
 		
 		$entityManager->persist($routeSort);
+		$entityManager->flush();
+		
+		return $this->redirectToRoute("{$this->route}index");
+	}
+
+	/**
+	 * sort
+	 * @Route("/paginate/{field}/{value}", name="paginate", methods="GET")
+	 */
+	public function paginate(
+		EntityManagerInterface $entityManager,
+		$field,
+		$value
+	): Response
+	{
+		$routePagination = $this->routePaginationRepository->findOneBy([
+			'route' => "{$this->route}index",
+			'userId' => $this->getUser()->getId(),
+			'field' => $field,
+		]);
+		
+		if (!$routePagination) {
+			$routePagination = new $this->routePaginationEntity();
+		}
+		
+		$routePagination->setRoute("{$this->route}index");
+		$routePagination->setUserId($this->getUser()->getId());
+		$routePagination->setField($field);
+		$routePagination->setValue($value);
+		
+		$entityManager->persist($routePagination);
 		$entityManager->flush();
 		
 		return $this->redirectToRoute("{$this->route}index");
