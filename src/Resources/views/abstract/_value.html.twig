@@ -1,0 +1,123 @@
+{% set continue = true %}
+{% set id = item.id %}
+{% set uniqkey = '' %}
+{% set field = '' %}
+
+{% for attribute in column.attributes if continue %}
+    {% if value is empty %}
+        {% set continue = false %}
+        {% set value = '' %}
+    {% elseif value is iterable %}
+        {% set continue = false %}
+    {% else %}
+        {% set value = attribute(value, attribute) %}
+    {% endif %}
+
+    {% set uniqkey = uniqkey ~ attribute %}
+    {% set field = attribute %}
+{% endfor %}
+
+{% if value is empty %}
+
+{% elseif column.type == 'date' %}
+    {{ value|date("d/m/Y") }}
+{% elseif column.type == 'datetime' %}
+    {{ value|date("d/m/Y H:m:s") }}
+{% elseif column.type == 'tag' %}
+    <span class="tag">{{ value|trans }}</span>
+{% elseif column.type == 'text' %}
+    {% if value|length > 50 %}
+        <a class="open-modal" href="{{ '#' ~ uniqkey ~ id }}">
+            {{ (value|trans|slice(0, 50) ~ '...') }}
+        </a>
+        <div class="modal" id="{{ uniqkey ~ item.id }}">
+            <div class="modal-background"></div>
+            <div class="modal-content">
+                <div class="card">
+                    <div class="card-content">
+                        {{ value|raw }}
+                    </div>
+                </div>
+            </div>
+            <button class="modal-close is-large" aria-label="close"></button>
+        </div>
+    {% else %}
+        {{ value|raw }}
+    {% endif %}
+{% elseif column.type == 'nullableImage' %}
+    <div class="buttons">
+        <a class="button open-modal" href="{{ '#' ~ uniqkey ~ id }}">
+            <figure class="image is-16x16">
+                <img src="{{ asset(value) }}" />
+            </figure>
+        </a>
+        <a class="button" href="{{ path("#{route}delete_image", {'id': item.id, 'field': field}) }}">
+            <span class="icon is-small">
+                <i class="far fa-trash-alt"></i>
+            </span>
+        </a>
+    </div>
+    <div class="modal" id="{{ uniqkey ~ id }}">
+        <div class="modal-background"></div>
+        <div class="modal-content">
+            <div class="card">
+                <div class="card-image">
+                    <figure class="image">
+                        <img src="{{ asset(value) }}" />
+                    </figure>
+                </div>
+            </div>
+        </div>
+        <button class="modal-close is-large" aria-label="close"></button>
+    </div>
+{% elseif column.type == 'image' %}
+    <a class="open-modal" href="{{ '#' ~ uniqkey ~ id }}">
+        <figure class="image is-64x64">
+            <img src="{{ asset(value) }}" />
+        </figure>
+    </a>
+    <div class="modal" id="{{ uniqkey ~ id }}">
+        <div class="modal-background"></div>
+        <div class="modal-content">
+            <div class="card">
+                <div class="card-image">
+                    <figure class="image">
+                        <img src="{{ asset(value) }}" />
+                    </figure>
+                </div>
+            </div>
+        </div>
+        <button class="modal-close is-large" aria-label="close"></button>
+    </div>
+{% elseif column.type == 'boolean' %}
+    {% if value %}
+        {{ 'rest.yes'|trans }}
+    {% else %}
+        {{ 'rest.no'|trans }}
+    {% endif %}
+{% elseif column.type == 'list' %}
+    {% set lastAttribute = column.attributes|last %}
+    <div class="tags">
+        {% for item in value|slice(0, 3) %}
+            <span class="tag">{{ attribute(item, lastAttribute) }}</span>
+        {% endfor %}
+        {% if value|length > 3 %}
+            <a class="tag is-link open-modal" href="{{ '#' ~ uniqkey ~ id }}">
+                {{ value|length - 3 }} {{ 'rest.more'|trans }}
+            </a>
+            <div class="modal" id="{{ uniqkey ~ id }}">
+                <div class="modal-background"></div>
+                <div class="modal-content">
+                    <div class="card">
+                        <div class="card-content">
+                            {% for item in value %}
+                                <span class="tag">{{ attribute(item, lastAttribute) }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <button class="modal-close is-large" aria-label="close"></button>
+            </div>
+        {% endif %}
+    </div>
+{% endif %}

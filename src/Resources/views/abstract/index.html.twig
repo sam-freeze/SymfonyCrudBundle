@@ -1,0 +1,231 @@
+{% extends 'hero.html.twig' %}
+
+{% block title %}{{ 'admin.list'|trans }} {{ "admin.#{title}.hero"|trans }}{% endblock %}
+{% block herotitle %}{{ 'admin.list'|trans }} {{ "admin.#{title}.hero"|trans }}{% endblock %}
+
+{% block body %}
+    {{ form_start(form) }}
+
+    <table class="table" width="100%">
+        <thead>
+            <tr>
+                {% for column in columns %}
+                    <th {% if loop.index > 2 %} class="is-hidden-mobile" {% endif %}>
+                        
+                        {% set sortName = column.attributes|join('_') %}
+
+                        {% if sort[sortName] is not defined %}
+                            <a class="has-text-dark" href="{{ path("#{route}sort_field", { 'field': sortName, 'order' : 'asc' }) }}">
+                                <span class="icon">
+                                    <i class="fas fa-sort"></i>
+                                </span>
+                                {{ "admin.#{title}.#{column.name}"|trans }}
+                            </a>
+                        {% elseif sort[sortName] == 'asc' %}
+                            <a class="has-text-dark" href="{{ path("#{route}sort_field", { 'field': sortName, 'order' : 'desc' }) }}">
+                                <span class="icon">
+                                    <i class="fas fa-sort-alpha-up"></i>
+                                </span>
+                                {{ "admin.#{title}.#{column.name}"|trans }}
+                            </a>
+                        {% elseif sort[sortName] == 'desc' %}
+                            <a class="has-text-dark" href="{{ path("#{route}reset_field_sorting", { 'field': sortName }) }}">
+                                <span class="icon">
+                                    <i class="fas fa-sort-alpha-down-alt"></i>
+                                </span>
+                                {{ "admin.#{title}.#{column.name}"|trans }}
+                            </a>
+                        {% else %}
+                            <a class="has-text-dark" href="{{ path("#{route}sort_field", { 'field': sortName, 'order' : 'asc' }) }}">
+                                <span class="icon">
+                                    <i class="fas fa-sort"></i>
+                                </span>
+                                {{ "admin.#{title}.#{column.name}"|trans }}
+                            </a>
+                        {% endif %}
+                    </th>
+                {% endfor %}
+                <th class="has-text-right" width="110">
+                    <div class="buttons">
+                        <a class="button" href="{{ path("#{route}reset_sorting") }}">
+                            <span class="icon">
+                                <i class="fas fa-sort"></i>
+                            </span>
+                        </a>
+                        <a class="button" href="{{ path("#{route}new") }}">
+                            <span class="icon is-small">
+                                <i class="fas fa-plus"></i>
+                            </span>
+                        </a>
+                    </div>
+                </th>
+            </tr>
+            <tr>
+                {% for column in columns %}
+                    <th {% if loop.index > 2 %} class="is-hidden-mobile" {% endif %}>
+                        {% set searchName = column.attributes|join('_') %}
+                        {% if form[searchName] is defined %}
+                            {{ form_widget(form[searchName]) }}
+                        {% endif %}
+                    </th>
+                {% endfor %}
+                <th class="has-text-right">
+                    <div class="buttons">
+                        <a class="button" href="{{ path("#{route}filter_reset") }}">
+                            <span class="icon is-small">
+                                <i class="fas fa-eraser"></i>
+                            </span>
+                        </a>
+                        <button type="submit" class="button">
+                            <span class="icon is-small">
+                                <i class="fas fa-search"></i>
+                            </span>
+                        </button>
+                    </div>
+                </th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                {% for column in columns %}
+                    <th {% if loop.index > 2 %} class="is-hidden-mobile" {% endif %}>
+                        
+                        {% set sortName = column.attributes|join('_') %}
+
+                        {% if sort[sortName] is not defined %}
+                            <a class="has-text-dark" href="{{ path("#{route}sort_field", { 'field': sortName, 'order' : 'asc' }) }}">
+                                <span class="icon">
+                                    <i class="fas fa-sort"></i>
+                                </span>
+                                {{ "admin.#{title}.#{column.name}"|trans }}
+                            </a>
+                        {% elseif sort[sortName] == 'asc' %}
+                            <a class="has-text-dark" href="{{ path("#{route}sort_field", { 'field': sortName, 'order' : 'desc' }) }}">
+                                <span class="icon">
+                                    <i class="fas fa-sort-alpha-up"></i>
+                                </span>
+                                {{ "admin.#{title}.#{column.name}"|trans }}
+                            </a>
+                        {% elseif sort[sortName] == 'desc' %}
+                            <a class="has-text-dark" href="{{ path("#{route}reset_field_sorting", { 'field': sortName }) }}">
+                                <span class="icon">
+                                    <i class="fas fa-sort-alpha-down-alt"></i>
+                                </span>
+                                {{ "admin.#{title}.#{column.name}"|trans }}
+                            </a>
+                        {% else %}
+                            <a class="has-text-dark" href="{{ path("#{route}sort_field", { 'field': sortName, 'order' : 'asc' }) }}">
+                                <span class="icon">
+                                    <i class="fas fa-sort"></i>
+                                </span>
+                                {{ "admin.#{title}.#{column.name}"|trans }}
+                            </a>
+                        {% endif %}
+                    </th>
+                {% endfor %}
+                <th class="has-text-right">
+                    <div class="select is-fullwidth">
+                        <select onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">
+                            {% for i in range(5, 50, 5) %}
+                                <option value="{{ path("#{route}paginate", {'field': 'limit', 'value': i}) }}" {{ i == pagination.limit ? 'selected' : null }}>{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </th>
+            </tr>
+        </tfoot>
+        <tbody>
+            {% for item in items %}
+                <tr>
+                    {% for column in columns %}
+                        <td {% if loop.index > 2 %} class="is-hidden-mobile" {% endif %}>
+                            {% include 'abstract/_value.html.twig' with { 'value': item, 'column': column } %}
+                        </td>
+                    {% endfor %}
+                    <td class="has-text-right">
+                        <div class="buttons">
+                            <a class="button" href="{{ path("#{route}edit", {'id': item.id}) }}">
+                                <span class="icon is-small">
+                                <i class="far fa-edit"></i>
+                                </span>
+                            </a>
+                            <a class="button" href="{{ path("#{route}delete", {'id': item.id}) }}">
+                                <span class="icon is-small">
+                                    <i class="far fa-trash-alt"></i>
+                                </span>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="columns">
+        <div class="column is-12">
+            <nav class="pagination is-centered">
+                {% set firstPage = 1 %}
+                {% set page = pagination.page %}
+                {% set limit = pagination.limit %}
+                {% set lastPage = (items.count / limit)|round(0, 'ceil') %}
+                {% set nextPage = page + 1 %}
+                {% set previousPage = page - 1 %}
+
+                {% set firstLoop = page - 1 %}
+                {% set lastLoop = page + 1 %}
+
+                {% if lastPage < firstPage %}
+                    {% set lastPage = firstPage %}
+                {% endif %}
+
+                {% if lastLoop > lastPage %}
+                    {% set firstLoop = lastPage - 2 %}
+                    {% set lastLoop = lastPage %}
+                {% endif %}
+
+                {% if firstLoop < firstPage %}
+                    {% set firstLoop = firstPage %}
+                    {% set lastLoop = firstPage + 2 %}
+                {% endif %}
+
+                {% if lastLoop > lastPage %}
+                    {% set lastLoop = lastPage %}
+                {% endif %}
+
+                {% if firstLoop < firstPage %}
+                    {% set firstLoop = firstPage %}
+                {% endif %}
+
+                <a class="pagination-previous" href="{{ path("#{route}paginate", {'field': 'page', 'value': previousPage > 1 ? previousPage : 1}) }}">
+                    <span class="icon is-small">
+                        <i class="fas fa-chevron-left"></i>
+                    </span>
+                </a>
+                <a class="pagination-next" href="{{ path("#{route}paginate", {'field': 'page', 'value': nextPage > lastPage ? lastPage : nextPage}) }}">
+                    <span class="icon is-small">
+                        <i class="fas fa-chevron-right"></i>
+                    </span>
+                </a>
+
+                <ul class="pagination-list">
+                    <li><a class="pagination-link {{ firstPage == page ? "is-current" : "" }}"
+                           href="{{ path("#{route}paginate", {'field': 'page', 'value': firstPage}) }}"
+                        >{{ firstPage }}</a></li>
+                    <li><span class="pagination-ellipsis">&hellip;</span></li>
+                    {% for i in range(firstLoop, lastLoop) %}
+                        <li><a class="pagination-link {{ i == page ? "is-current" : "" }}"
+                               href="{{ path("#{route}paginate", {'field': 'page', 'value': i}) }}"
+                            >{{ i }}</a></li>
+                    {% endfor %}
+                    <li><span class="pagination-ellipsis">&hellip;</span></li>
+                    <li><a class="pagination-link {{ lastPage == page ? "is-current" : "" }}"
+                           href="{{ path("#{route}paginate", {'field': 'page', 'value': lastPage}) }}"
+                        >{{ lastPage }}</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+
+    {{ form_end(form) }}
+{% endblock %}

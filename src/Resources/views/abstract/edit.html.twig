@@ -1,0 +1,19 @@
+{% extends 'hero.html.twig' %}
+
+{% block title %}{% if item.id %}{{ 'admin.edit'|trans }} {% else %} {{ 'admin.create'|trans }} {% endif %} {{ title }} {% endblock %}
+
+{% block body %}
+    <div class="column is-6 is-offset-3 has-text-centered">
+        <h2 class="title">{% if item.id %}{{ 'admin.edit'|trans }} {% else %} {{ 'admin.create'|trans }} {% endif %} {{ title }}</h2>
+
+        <div class="box">
+            {{ include('abstract/_form.html.twig') }}
+        </div>
+
+        <p>
+            <a href="{{ path("#{route}index") }}">
+                {{ 'admin.back'|trans }}
+            </a>
+        </p>
+    </div>
+{% endblock %}
