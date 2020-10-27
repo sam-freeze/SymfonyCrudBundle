@@ -77,14 +77,16 @@ abstract class AbstractAdminController extends Controller {
 			$paginationData['limit'] = 5;
 		}
     	
-        $form = $this->generateSearchForm($searchData);
+		$form = $this->generateSearchForm($searchData);
+		
+		$title = $this->getTitle();
 
-        return $this->render('abstract/index.html.twig', [
+        return $this->render("{$title}/index.html.twig", [
             'items' => $this->repository->search($searchData, $sortData, $paginationData),
             'pagination' => $paginationData,
             'columns' => $this->columns,
             'route' => $this->route,
-            'title' => $this->getTitle(),
+            'title' => $title,
 			'form' => $form->createView(),
 			'sort' => $sortData
 		]);
@@ -429,11 +431,13 @@ abstract class AbstractAdminController extends Controller {
 			}
 		}
 	
-		return $this->render('abstract/edit.html.twig', [
+		$title = $this->getTitle();
+
+		return $this->render("{$title}/edit.html.twig", [
 			'item' => $item,
             'form' => $form->createView(),
             'route' => $this->route,
-            'title' => $this->getTitle(),
+            'title' => $title,
 		]);
 	}
 

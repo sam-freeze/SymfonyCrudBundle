@@ -52,6 +52,8 @@
                                 <i class="fas fa-sort"></i>
                             </span>
                         </a>
+                        {% block head_btn %}
+                        {% endblock %}
                         <a class="button" href="{{ path("#{route}new") }}">
                             <span class="icon is-small">
                                 <i class="fas fa-plus"></i>
@@ -139,11 +141,13 @@
                 <tr>
                     {% for column in columns %}
                         <td {% if loop.index > 2 %} class="is-hidden-mobile" {% endif %}>
-                            {% include 'abstract/_value.html.twig' with { 'value': item, 'column': column } %}
+                            {% include "#{title}/_value.html.twig" with { 'value': item, 'column': column } %}
                         </td>
                     {% endfor %}
                     <td class="has-text-right">
                         <div class="buttons">
+                            {% block item_btn %}
+                            {% endblock %}
                             <a class="button" href="{{ path("#{route}edit", {'id': item.id}) }}">
                                 <span class="icon is-small">
                                 <i class="far fa-edit"></i>

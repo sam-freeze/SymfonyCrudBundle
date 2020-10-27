@@ -7,7 +7,7 @@
         <h2 class="title">{% if item.id %}{{ 'admin.edit'|trans }} {% else %} {{ 'admin.create'|trans }} {% endif %} {{ title }}</h2>
 
         <div class="box">
-            {{ include('abstract/_form.html.twig') }}
+            {% include "#{title}/_form.html.twig" %}
         </div>
 
         <p>
