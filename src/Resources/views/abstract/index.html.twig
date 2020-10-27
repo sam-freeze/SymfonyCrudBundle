@@ -45,8 +45,8 @@
                         {% endif %}
                     </th>
                 {% endfor %}
-                <th class="has-text-right" width="110">
-                    <div class="buttons">
+                <th width="110">
+                    <div class="buttons has-addons is-right">
                         <a class="button" href="{{ path("#{route}reset_sorting") }}">
                             <span class="icon">
                                 <i class="fas fa-sort"></i>
@@ -71,8 +71,8 @@
                         {% endif %}
                     </th>
                 {% endfor %}
-                <th class="has-text-right">
-                    <div class="buttons">
+                <th>
+                    <div class="buttons has-addons is-right">
                         <a class="button" href="{{ path("#{route}filter_reset") }}">
                             <span class="icon is-small">
                                 <i class="fas fa-eraser"></i>
@@ -144,8 +144,8 @@
                             {% include "#{title}/_value.html.twig" with { 'value': item, 'column': column } %}
                         </td>
                     {% endfor %}
-                    <td class="has-text-right">
-                        <div class="buttons">
+                    <td>
+                        <div class="buttons has-addons is-right">
                             {% block item_btn %}
                             {% endblock %}
                             <a class="button" href="{{ path("#{route}edit", {'id': item.id}) }}">
