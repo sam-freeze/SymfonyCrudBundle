@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace SamFreeze\SymfonyCrudBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -12,7 +12,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Yaml\Yaml;
 
-class AbstractAdminTranslationController extends Controller
+abstract class AbstractAdminTranslationController extends Controller
 {
 
 	/**
