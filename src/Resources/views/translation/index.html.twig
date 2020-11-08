@@ -1,0 +1,51 @@
+{% extends 'hero.html.twig' %}
+
+{% block title %}{{ 'admin.translation.index'|trans({}, 'SymfonyCrudBundle') }}{% endblock %}
+{% block herotitle %}{{ 'admin.translation.index'|trans({}, 'SymfonyCrudBundle') }}{% endblock %}
+{% block subtitle %}{{ 'admin.translation.list'|trans({}, 'SymfonyCrudBundle') }}{% endblock %}
+{% block herosubtitle %}{{ 'admin.translation.list'|trans({}, 'SymfonyCrudBundle') }}{% endblock %}
+
+{% block body %}
+    <table class="table" width="100%">
+        <thead>
+            <tr>
+                <th>{{ 'admin.translation.group'|trans({}, 'SymfonyCrudBundle') }}</th>
+                <th class="has-text-right">
+                    <a class="button" href="{{ path("admin_translation_new") }}">
+                        <span class="icon is-small">
+                            <i class="fas fa-plus"></i>
+                        </span>
+                    </a>
+                </th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <th>{{ 'admin.translation.group'|trans({}, 'SymfonyCrudBundle') }}</th>
+                <th class="has-text-right">
+                    <a class="button" href="{{ path("admin_translation_new") }}">
+                        <span class="icon is-small">
+                            <i class="fas fa-plus"></i>
+                        </span>
+                    </a>
+                </th>
+            </tr>
+        </tfoot>
+        <tbody>
+            {% for group in groups %}
+                <tr>
+                    <td>
+                        {{ group|trans }}
+                    </td>
+                    <td class="has-text-right">
+                        <a class="button" href="{{ path("admin_translation_edit", {'id': group }) }}">
+                            <span class="icon is-small">
+                              <i class="far fa-edit"></i>
+                            </span>
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

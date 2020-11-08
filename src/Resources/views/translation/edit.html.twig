@@ -1,0 +1,20 @@
+{% extends 'hero.html.twig' %}
+
+{% block title %}{{ 'admin.translation.index'|trans }}{% endblock %}
+{% block subtitle %}{{ 'admin.translation.list'|trans }}{% endblock %}
+{% block herotitle %}{{ 'admin.translation.index'|trans }}{% endblock %}
+{% block herosubtitle %}{{ app.request.query.get('id') }}{% endblock %}
+
+{% block body %}
+    <div class="column is-6 is-offset-3 has-text-centered">
+        <div class="box">
+            {{ include('abstract/_form.html.twig') }}
+        </div>
+
+        <p>
+            <a href="{{ path("admin_translation_index") }}">
+                {{ 'admin.back'|trans }}
+            </a>
+        </p>
+    </div>
+{% endblock %}

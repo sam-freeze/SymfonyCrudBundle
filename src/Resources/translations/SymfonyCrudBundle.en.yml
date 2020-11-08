@@ -11,3 +11,4 @@ admin.create: Create
 admin.edit: Modify
 admin.back: Back
 admin.save: Save
+admin.translation.group: Translations
