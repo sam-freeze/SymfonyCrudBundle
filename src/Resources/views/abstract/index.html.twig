@@ -1,7 +1,7 @@
 {% extends 'hero.html.twig' %}
 
-{% block title %}{{ 'admin.list'|trans({}, 'SymfonyCrudBundle') }} {{ "admin.#{title}.hero"|trans }}{% endblock %}
-{% block herotitle %}{{ 'admin.list'|trans({}, 'SymfonyCrudBundle') }} {{ "admin.#{title}.hero"|trans }}{% endblock %}
+{% block title %}{{ "admin.#{title}.hero"|trans }}{% endblock %}
+{% block herotitle %}{{ "admin.#{title}.hero"|trans }}{% endblock %}
 
 {% block body %}
     {{ form_start(form) }}
