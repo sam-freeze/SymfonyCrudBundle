@@ -135,7 +135,7 @@ abstract class AbstractAdminController extends Controller {
 			$entityManager->flush();
 		}
 		
-		$this->addFlash('notice', $this->translator->trans('admin.erased'));
+		$this->addFlash('notice', $this->translator->trans('admin.erased', [], 'SymfonyCrudBundle'));
 		
 		return $this->redirectToRoute("{$this->route}index");
 	}
@@ -250,8 +250,8 @@ abstract class AbstractAdminController extends Controller {
 			switch ($searchType) {
 				case ChoiceType::class:
 					$values = [
-						$this->translator->trans('admin.all') => '',
-						$this->translator->trans('admin.empty') => 'null'
+						$this->translator->trans('admin.all', [], 'SymfonyCrudBundle') => '',
+						$this->translator->trans('admin.empty', [], 'SymfonyCrudBundle') => 'null'
 					];
 					
 					foreach ($this->repository->findDistinctValues($attributes) as $value) {
@@ -343,7 +343,7 @@ abstract class AbstractAdminController extends Controller {
 			$entityManager->flush();
 		}
 		
-		$this->addFlash('notice', $this->translator->trans('admin.erased'));
+		$this->addFlash('notice', $this->translator->trans('admin.erased', [], 'SymfonyCrudBundle'));
     	
 		return $this->redirectToRoute("{$this->route}index");
     }
@@ -367,7 +367,7 @@ abstract class AbstractAdminController extends Controller {
 		$item = $this->repository->findOneBy(['id' => $id]);
 
         if (!$item) {
-            $this->addFlash('error', $this->translator->trans('admin.notfound'));
+            $this->addFlash('error', $this->translator->trans('admin.notfound', [], 'SymfonyCrudBundle'));
             return $this->redirectToRoute("{$this->route}index");
         }
 
@@ -422,7 +422,7 @@ abstract class AbstractAdminController extends Controller {
 				$em->persist($item);
 				$em->flush();
 				
-				$this->addFlash('notice', $this->translator->trans('admin.saved'));
+				$this->addFlash('notice', $this->translator->trans('admin.saved', [], 'SymfonyCrudBundle'));
 				return $this->redirectToRoute("{$this->route}index");
 			} else {
 				foreach ($form->getErrors() as $error) {
@@ -453,7 +453,7 @@ abstract class AbstractAdminController extends Controller {
 		$item = $this->repository->findOneBy(['id' => $id]);
 
         if (!$item) {
-            $this->addFlash('error', $this->translator->trans('admin.notfound'));
+            $this->addFlash('error', $this->translator->trans('admin.notfound', [], 'SymfonyCrudBundle'));
             return $this->redirectToRoute("{$this->route}index");
 		}
 		
@@ -469,7 +469,7 @@ abstract class AbstractAdminController extends Controller {
 			unlink($oldImage);
 		}
 	
-        $this->addFlash('notice', $this->translator->trans('admin.imageDeleted'));
+        $this->addFlash('notice', $this->translator->trans('admin.imageDeleted', [], 'SymfonyCrudBundle'));
         
         return $this->redirectToRoute("{$this->route}index");
 	}
@@ -486,14 +486,14 @@ abstract class AbstractAdminController extends Controller {
 		$item = $this->repository->findOneBy(['id' => $id]);
 
         if (!$item) {
-            $this->addFlash('error', $this->translator->trans('admin.notfound'));
+            $this->addFlash('error', $this->translator->trans('admin.notfound', [], 'SymfonyCrudBundle'));
             return $this->redirectToRoute("{$this->route}index");
         }
 
 		$entityManager->remove($item);
 		$entityManager->flush();
 	
-        $this->addFlash('notice', $this->translator->trans('admin.deleted'));
+        $this->addFlash('notice', $this->translator->trans('admin.deleted', [], 'SymfonyCrudBundle'));
         
         return $this->redirectToRoute("{$this->route}index");
 	}

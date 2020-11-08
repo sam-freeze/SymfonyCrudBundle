@@ -87,7 +87,7 @@ abstract class AbstractAdminTranslationController extends Controller
 				$cacheDir = $this->get('kernel')->getCacheDir();
 				$fileSystem->remove("$cacheDir/translations");
 				
-				$this->addFlash('notice', $translator->trans('rest.saved'));
+				$this->addFlash('notice', $translator->trans('admin.saved', [], 'SymfonyCrudBundle'));
 				return $this->redirectToRoute("admin_translation_index");
 			} else {
 				foreach ($form->getErrors() as $error) {
@@ -152,7 +152,7 @@ abstract class AbstractAdminTranslationController extends Controller
 				$cacheDir = $this->get('kernel')->getCacheDir();
 				$fileSystem->remove("$cacheDir/translations");
 				
-				$this->addFlash('notice', $translator->trans('rest.saved'));
+				$this->addFlash('notice', $translator->trans('admin.saved', [], 'SymfonyCrudBundle'));
 				return $this->redirectToRoute("admin_translation_index");
 			} else {
 				foreach ($form->getErrors() as $error) {
