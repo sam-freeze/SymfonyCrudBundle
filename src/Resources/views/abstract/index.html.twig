@@ -137,31 +137,39 @@
             </tr>
         </tfoot>
         <tbody>
-            {% for item in items %}
-                <tr>
-                    {% for column in columns %}
-                        <td {% if loop.index > 2 %} class="is-hidden-mobile" {% endif %}>
-                            {% include "#{title}/_value.html.twig" with { 'value': item, 'column': column } %}
+            {% if items|length > 0 %}
+                {% for item in items %}
+                    <tr>
+                        {% for column in columns %}
+                            <td {% if loop.index > 2 %} class="is-hidden-mobile" {% endif %}>
+                                {% include "#{title}/_value.html.twig" with { 'value': item, 'column': column } %}
+                            </td>
+                        {% endfor %}
+                        <td>
+                            <div class="buttons has-addons is-right">
+                                {% block item_btn %}
+                                {% endblock %}
+                                <a class="button" href="{{ path("#{route}edit", {'id': item.id}) }}">
+                                    <span class="icon is-small">
+                                    <i class="far fa-edit"></i>
+                                    </span>
+                                </a>
+                                <a class="button" href="{{ path("#{route}delete", {'id': item.id}) }}">
+                                    <span class="icon is-small">
+                                        <i class="far fa-trash-alt"></i>
+                                    </span>
+                                </a>
+                            </div>
                         </td>
-                    {% endfor %}
-                    <td>
-                        <div class="buttons has-addons is-right">
-                            {% block item_btn %}
-                            {% endblock %}
-                            <a class="button" href="{{ path("#{route}edit", {'id': item.id}) }}">
-                                <span class="icon is-small">
-                                <i class="far fa-edit"></i>
-                                </span>
-                            </a>
-                            <a class="button" href="{{ path("#{route}delete", {'id': item.id}) }}">
-                                <span class="icon is-small">
-                                    <i class="far fa-trash-alt"></i>
-                                </span>
-                            </a>
-                        </div>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="{{ columns|length + 1 }}" class="has-text-centered has-text-primary">
+                        {{ 'admin.noresult'|trans({}, 'SymfonyCrudBundle') }}
                     </td>
                 </tr>
-            {% endfor %}
+            {% endif %}
         </tbody>
     </table>
 
