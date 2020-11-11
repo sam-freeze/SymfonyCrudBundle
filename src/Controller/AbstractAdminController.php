@@ -235,6 +235,7 @@ abstract class AbstractAdminController extends Controller {
 	 * @return \Symfony\Component\Form\FormInterface
 	 */
     private function generateSearchForm($data) {
+		$title = $this->getTitle();
 		$formBuilder = $this->createFormBuilder($data);
 		$formBuilder->setAction($this->generateUrl("{$this->route}filter"));
 	
@@ -266,7 +267,7 @@ abstract class AbstractAdminController extends Controller {
 			
 			$searchOptions['required'] = false;
 			$searchOptions['attr'] = [
-				'placeholder' => $searchLabel
+				'placeholder' => $this->translator->trans("admin.{$title}.{$searchLabel}", [], 'SymfonyCrudBundle')
 			];
 		
 			$formBuilder->add(
