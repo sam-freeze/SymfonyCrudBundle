@@ -36,7 +36,7 @@ abstract class AbstractAdminTranslationController extends Controller
 			
 		}
 
-		return $this->render('translation/index.html.twig', ['groups' => array_unique($groups)]);
+		return $this->render('admin_translation/index.html.twig', ['groups' => array_unique($groups)]);
 	}
 
 	/**
@@ -96,7 +96,7 @@ abstract class AbstractAdminTranslationController extends Controller
 			}
         }
 		
-        return $this->render('translation/edit.html.twig', ['form' => $form->createView()]);
+        return $this->render('admin_translation/edit.html.twig', ['form' => $form->createView()]);
     }
 
     /**
@@ -161,6 +161,6 @@ abstract class AbstractAdminTranslationController extends Controller
 			}
         }
 		
-        return $this->render('translation/edit.html.twig', ['form' => $form->createView()]);
+        return $this->render('admin_translation/edit.html.twig', ['form' => $form->createView()]);
     }
 }

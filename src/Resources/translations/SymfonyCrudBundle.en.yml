@@ -13,5 +13,4 @@ admin.back: Back
 admin.save: Save
 admin.translation.group: Section
 admin.translation.index: Translations
-admin.translation.list: Static translations
 admin.noresult: No result
