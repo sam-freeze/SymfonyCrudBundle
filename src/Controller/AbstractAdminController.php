@@ -268,7 +268,7 @@ abstract class AbstractAdminController extends Controller {
 			
 			$searchOptions['required'] = false;
 			$searchOptions['attr'] = [
-				'placeholder' => $this->translator->trans("admin.{$title}.{$searchLabel}", [], 'SymfonyCrudBundle')
+				'placeholder' => $this->translator->trans("{$title}.{$searchLabel}", [], 'SymfonyCrudBundle')
 			];
 		
 			$formBuilder->add(
