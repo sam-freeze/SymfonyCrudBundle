@@ -57,11 +57,12 @@ abstract class AbstractAdminController extends Controller {
 	 */
 	private function getTitle() {
 		$path = explode('\\', $this->entity);
-		return strtolower(array_pop($path));
+		$entityName = strtolower(array_pop($path));
+		return "admin_{$entityName}";
 	}
 
     /**
-     * @Route("/", name="index", methods="GET|POST")
+     * @Route("", name="index", methods="GET|POST")
      */
     public function index(Request $request, EntityManagerInterface $entityManager): Response
     {
