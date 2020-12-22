@@ -61,6 +61,13 @@ abstract class AbstractAdminController extends Controller {
 		return "admin_{$entityName}";
 	}
 
+	/**
+	 * hook to search data
+	 */
+	protected function searchData($searchData, $sortData, $paginationData) {
+		return $this->repository->search($searchData, $sortData, $paginationData);
+	}
+
     /**
      * @Route("", name="index", methods="GET|POST")
      */
@@ -83,7 +90,7 @@ abstract class AbstractAdminController extends Controller {
 		$title = $this->getTitle();
 
         return $this->render("{$title}/index.html.twig", [
-            'items' => $this->repository->search($searchData, $sortData, $paginationData),
+            'items' => $this->searchData($searchData, $sortData, $paginationData),
             'pagination' => $paginationData,
             'columns' => $this->columns,
             'route' => $this->route,
@@ -376,7 +383,7 @@ abstract class AbstractAdminController extends Controller {
 		return $this->generateForm($request, $item);
     }
     
-    private function generateForm($request, $item) {
+    protected function generateForm($request, $item) {
         $classNamespace = explode('\\', get_class($item));
         $className = array_pop($classNamespace);
         
