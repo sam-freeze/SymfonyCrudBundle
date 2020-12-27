@@ -12,8 +12,35 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Yaml\Yaml;
 
-abstract class AbstractAdminTranslationController extends Controller
+abstract class AbstractTranslationController extends Controller
 {
+
+	function __construct(
+		TranslatorInterface $translator,
+		$title,
+		$route,
+		$path
+	) {
+		$this->translator = $translator;
+		$this->title = $title;
+		$this->route = $route;
+		$this->path = $path;
+	}
+
+	public function getPath(): String
+    {
+		return $this->path;
+	}
+
+	public function getRoute(): String
+    {
+		return $this->route;
+	}
+
+	public function getTitle(): String
+    {
+		return $this->title;
+	}
 
 	/**
      * @Route("/", name="index", methods="GET|POST")
@@ -21,12 +48,14 @@ abstract class AbstractAdminTranslationController extends Controller
     public function index(Request $request, TranslatorInterface $translator): Response
     {
 		// file path
-    	$locale = $translator->getLocale();
-        $path = "translations/messages.$locale.yml";
+		$locale = $translator->getLocale();
+		$title = $this->getTitle();
+		$path = $this->getPath();
+        $filePath = "$path/messages.$locale.yml";
 
 		$groups = [];
 	
-		foreach (Yaml::parseFile($path) as $key => $value) {
+		foreach (Yaml::parseFile($filePath) as $key => $value) {
 			$explodedKey = explode('.', $key);
 
 			if (count($explodedKey) > 1) {
@@ -36,7 +65,7 @@ abstract class AbstractAdminTranslationController extends Controller
 			
 		}
 
-		return $this->render('admin_translation/index.html.twig', ['groups' => array_unique($groups)]);
+		return $this->render("$title/index.html.twig", ['groups' => array_unique($groups)]);
 	}
 
 	/**
@@ -44,6 +73,11 @@ abstract class AbstractAdminTranslationController extends Controller
      */
     public function new(Request $request, TranslatorInterface $translator): Response
     {
+		$locale = $translator->getLocale();
+		$path = $this->getPath();
+		$route = $this->getRoute();
+		$title = $this->getTitle();
+
 		// build form by group
 		$formBuilder = $this->createFormBuilder();
 		
@@ -67,9 +101,8 @@ abstract class AbstractAdminTranslationController extends Controller
 				$value = $data['value'];
 
 				// file path
-				$locale = $translator->getLocale();
-				$path = "translations/messages.$locale.yml";
-				$translations = Yaml::parseFile($path);
+				$filePath = "$path/messages.$locale.yml";
+				$translations = Yaml::parseFile($filePath);
 
 				if ($group) {
 					$translations["$group.$key"] = $value;
@@ -80,23 +113,23 @@ abstract class AbstractAdminTranslationController extends Controller
 				// read and write new yaml
 				$yaml = Yaml::dump($translations);
 
-				file_put_contents($path, $yaml);
+				file_put_contents($filePath, $yaml);
 				
 				// clear translation cache
 				$fileSystem = new Filesystem();
 				$cacheDir = $this->get('kernel')->getCacheDir();
-				$fileSystem->remove("$cacheDir/translations");
+				$fileSystem->remove("$cacheDir/$path");
 				
 				$this->addFlash('notice', $translator->trans('admin.saved', [], 'SymfonyCrudBundle'));
-				return $this->redirectToRoute("admin_translation_index");
+				return $this->redirectToRoute("{$route}index");
 			} else {
 				foreach ($form->getErrors() as $error) {
 					$this->addFlash('error', $error->getMessage());
 				}
 			}
-        }
+		}
 		
-        return $this->render('admin_translation/edit.html.twig', ['form' => $form->createView()]);
+        return $this->render("$title/edit.html.twig", ['form' => $form->createView()]);
     }
 
     /**
@@ -105,15 +138,18 @@ abstract class AbstractAdminTranslationController extends Controller
     public function edit(Request $request, TranslatorInterface $translator): Response
     {
     	// file path
-    	$locale = $translator->getLocale();
-        $path = "translations/messages.$locale.yml";
+		$locale = $translator->getLocale();
+		$path = $this->getPath();
+		$route = $this->getRoute();
+		$title = $this->getTitle();
+        $filePath = "$path/messages.$locale.yml";
         
 		$translations = [];
 		$groupTranslations = [];
 
 		$group = $request->query->get('id');
 	
-		foreach (Yaml::parseFile($path) as $key => $value) {
+		foreach (Yaml::parseFile($filePath) as $key => $value) {
 			$explodedKey = explode('.', $key);
 			
 			$translations[$key] = $value;
@@ -145,15 +181,15 @@ abstract class AbstractAdminTranslationController extends Controller
 				
 				// write new yaml
 				$yaml = Yaml::dump($translations);
-				file_put_contents($path, $yaml);
+				file_put_contents($filePath, $yaml);
 				
 				// clear translation cache
 				$fileSystem = new Filesystem();
 				$cacheDir = $this->get('kernel')->getCacheDir();
-				$fileSystem->remove("$cacheDir/translations");
+				$fileSystem->remove("$cacheDir/$path");
 				
 				$this->addFlash('notice', $translator->trans('admin.saved', [], 'SymfonyCrudBundle'));
-				return $this->redirectToRoute("admin_translation_index");
+				return $this->redirectToRoute("{$route}index");
 			} else {
 				foreach ($form->getErrors() as $error) {
 					$this->addFlash('error', $error->getMessage());
@@ -161,6 +197,6 @@ abstract class AbstractAdminTranslationController extends Controller
 			}
         }
 		
-        return $this->render('admin_translation/edit.html.twig', ['form' => $form->createView()]);
+        return $this->render("$title/edit.html.twig", ['form' => $form->createView()]);
     }
 }
