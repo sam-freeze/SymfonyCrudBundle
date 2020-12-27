@@ -65,7 +65,7 @@ abstract class AbstractCrudController extends Controller {
 	 */
 	protected function trans($key) {
 		$title = $this->getTitle();
-		return $this->trans("{$title}.{$key}");
+		return $this->translator->trans("{$title}.{$key}");
 	}
 
 	/**

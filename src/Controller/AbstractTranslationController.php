@@ -43,6 +43,14 @@ abstract class AbstractTranslationController extends Controller
 	}
 
 	/**
+	 * trans key
+	 */
+	protected function trans($key) {
+		$title = $this->getTitle();
+		return $this->translator->trans("{$title}.{$key}");
+	}
+
+	/**
      * @Route("/", name="index", methods="GET|POST")
      */
     public function index(Request $request, TranslatorInterface $translator): Response
@@ -65,7 +73,10 @@ abstract class AbstractTranslationController extends Controller
 			
 		}
 
-		return $this->render("$title/index.html.twig", ['groups' => array_unique($groups)]);
+		return $this->render("$title/index.html.twig", [
+			'groups' => array_unique($groups),
+			'title' => $title
+		]);
 	}
 
 	/**
@@ -120,7 +131,7 @@ abstract class AbstractTranslationController extends Controller
 				$cacheDir = $this->get('kernel')->getCacheDir();
 				$fileSystem->remove("$cacheDir/$path");
 				
-				$this->addFlash('notice', $translator->trans('admin.saved', [], 'SymfonyCrudBundle'));
+				$this->addFlash('notice', $this->trans('saved'));
 				return $this->redirectToRoute("{$route}index");
 			} else {
 				foreach ($form->getErrors() as $error) {
@@ -129,7 +140,10 @@ abstract class AbstractTranslationController extends Controller
 			}
 		}
 		
-        return $this->render("$title/edit.html.twig", ['form' => $form->createView()]);
+        return $this->render("$title/edit.html.twig", [
+			'form' => $form->createView(),
+			'title' => $title
+		]);
     }
 
     /**
@@ -188,7 +202,7 @@ abstract class AbstractTranslationController extends Controller
 				$cacheDir = $this->get('kernel')->getCacheDir();
 				$fileSystem->remove("$cacheDir/$path");
 				
-				$this->addFlash('notice', $translator->trans('admin.saved', [], 'SymfonyCrudBundle'));
+				$this->addFlash('notice', $this->trans('saved'));
 				return $this->redirectToRoute("{$route}index");
 			} else {
 				foreach ($form->getErrors() as $error) {
@@ -197,6 +211,9 @@ abstract class AbstractTranslationController extends Controller
 			}
         }
 		
-        return $this->render("$title/edit.html.twig", ['form' => $form->createView()]);
+        return $this->render("$title/edit.html.twig", [
+			'form' => $form->createView(),
+			'title' => $title
+		]);
     }
 }
