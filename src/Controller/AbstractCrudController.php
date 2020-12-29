@@ -327,7 +327,7 @@ abstract class AbstractCrudController extends Controller {
                 
                 foreach($form->all() as $field) {
                     $name = $field->getName();
-                    $data = $field->getUserData();
+                    $data = $field->getData();
                     $setFunc="set$name";
 
                     $config = $field->getConfig();
