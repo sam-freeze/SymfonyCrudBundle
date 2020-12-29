@@ -24,48 +24,70 @@ use Symfony\Component\HttpFoundation\Request;
 
 abstract class AbstractCrudController extends Controller {
 
-    function __construct(
+	protected $translator;
+	
+	protected $routePaginationRepository;
+
+	protected $routeSortRepository;
+
+	protected $routeSearchRepository;
+	
+	protected $repository;
+	
+	protected $route;
+	
+	protected $name;
+	
+	function __construct(
 		TranslatorInterface $translator,
-    	AbstractRouteSearchRepository $routeSearchRepository,
+		AbstractRouteSearchRepository $routeSearchRepository,
 		AbstractRouteSortRepository $routeSortRepository,
 		AbstractRoutePaginationRepository $routePaginationRepository,
 		AbstractRepository $repository,
-		$routeSearchEntity,
-		$routeSortEntity,
-		$routePaginationEntity,
-		$entity,
-		$form,
 		$route,
-		$columns
+		$name
 	) {
 		$this->translator = $translator;
-    	$this->routeSearchRepository = $routeSearchRepository;
-		$this->routeSortRepository = $routeSortRepository;
 		$this->routePaginationRepository = $routePaginationRepository;
-    	$this->repository = $repository;
-        $this->routeSearchEntity = $routeSearchEntity;
-		$this->routeSortEntity = $routeSortEntity;
-		$this->routePaginationEntity = $routePaginationEntity;
-		$this->entity = $entity;
-        $this->form = $form;
-        $this->route = $route;
-		$this->columns = $columns;
+		$this->routeSortRepository = $routeSortRepository;
+		$this->routeSearchRepository = $routeSearchRepository;
+		$this->repository = $repository;
+		$this->route = $route;
+		$this->name = $name;
 	}
+
+	/**
+	 * hook to get form
+	 */
+	abstract function getForm();
+
+	/**
+	 * hook to generate a new entity
+	 */
+	abstract function getNewEntity();
 	
 	/**
-	 * get title from entity
+	 * get name
+	 * @return mixed
 	 */
-	protected function getTitle() {
-		$path = explode('\\', $this->entity);
-		return strtolower(array_pop($path));
+	protected function getName() {
+		return $this->name;
+	}
+
+	/**
+	 * get route
+	 * @return mixed
+	 */
+	protected function getRoute() {
+		return $this->route;
 	}
 
 	/**
 	 * trans key
 	 */
 	protected function trans($key) {
-		$title = $this->getTitle();
-		return $this->translator->trans("{$title}.{$key}");
+		$name = $this->getName();
+		return $this->translator->trans("{$name}.{$key}");
 	}
 
 	/**
@@ -75,53 +97,24 @@ abstract class AbstractCrudController extends Controller {
 		return $this->repository->search($searchData, $sortData, $paginationData);
 	}
 
-    /**
-     * @Route("", name="index", methods="GET|POST")
-     */
-    public function index(Request $request, EntityManagerInterface $entityManager): Response
-    {
-		$searchData = $this->getUserData($this->routeSearchRepository);
-		$sortData = $this->getUserData($this->routeSortRepository);
-		$paginationData = $this->getUserData($this->routePaginationRepository);
-
-		if (!array_key_exists('page', $paginationData)) {
-			$paginationData['page'] = 1;
-		}
-
-		if (!array_key_exists('limit', $paginationData)) {
-			$paginationData['limit'] = 5;
-		}
-    	
-		$form = $this->generateSearchForm($searchData);
-		
-		$title = $this->getTitle();
-
-        return $this->render("{$title}/index.html.twig", [
-            'items' => $this->searchData($searchData, $sortData, $paginationData),
-            'pagination' => $paginationData,
-            'columns' => $this->columns,
-            'route' => $this->route,
-            'title' => $title,
-			'form' => $form->createView(),
-			'sort' => $sortData
-		]);
-    }
-	
 	/**
-	 * getUserData
-	 * @param $repository
+	 * get user data from repository
+	 * @param $repo
+	 * @param $route
 	 * @return array
 	 */
-    private function getUserData($repo) {
+	private function getUserData($repo) {
+		$route = $this->getRoute();
+		
 		$items = $repo->findBy([
 			'userId' => $this->getUser()->getId(),
-			'route' => "{$this->route}index"
+			'route' => "{$route}index"
 		], [
 			'id' => 'asc'
 		]);
-	
+		
 		$data = [];
-	
+		
 		foreach ($items as $item) {
 			$data[$item->getField()] = $item->getValue();
 		}
@@ -130,131 +123,16 @@ abstract class AbstractCrudController extends Controller {
 	}
 	
 	/**
-	 * resetSort
-	 * @Route("/sort/reset", name="reset_sorting", methods="GET")
-	 */
-	public function resetSort(
-		EntityManagerInterface $entityManager
-	): Response
-	{
-		$routeSortingList = $this->routeSortRepository->findBy([
-			'route' => "{$this->route}index",
-			'userId' => $this->getUser()->getId()
-		]);
-		
-		if ($routeSortingList) {
-			foreach ($routeSortingList as $routeSorting) {
-				$entityManager->remove($routeSorting);
-			}
-			
-			$entityManager->flush();
-		}
-		
-		$this->addFlash('notice', $this->trans('erased'));
-		
-		return $this->redirectToRoute("{$this->route}index");
-	}
-
-	/**
-	 * sortReset
-	 * @Route("/sort/{field}/reset", name="reset_field_sorting", methods="GET")
-	 */
-	public function resetFieldSorting(
-		EntityManagerInterface $entityManager,
-		$field
-	): Response
-	{
-		$routeSort = $this->routeSortRepository->findOneBy([
-			'route' => "{$this->route}index",
-			'userId' => $this->getUser()->getId(),
-			'field' => $field,
-		]);
-		
-		if ($routeSort) {
-			$entityManager->remove($routeSort);
-			$entityManager->flush();
-		}
-		
-		return $this->redirectToRoute("{$this->route}index");
-	}
-	
-	/**
-	 * sort
-	 * @Route("/sort/{field}/{order}", name="sort_field", methods="GET")
-	 */
-	public function sortField(
-		EntityManagerInterface $entityManager,
-		$field,
-		$order
-	): Response
-	{
-		if ($order !== 'asc' && $order !== 'desc') {
-			return $this->redirectToRoute("{$this->route}index");
-		}
-
-		$routeSort = $this->routeSortRepository->findOneBy([
-			'route' => "{$this->route}index",
-			'userId' => $this->getUser()->getId(),
-			'field' => $field,
-		]);
-		
-		if (!$routeSort) {
-			$routeSort = new $this->routeSortEntity();
-		}
-		
-		$routeSort->setRoute("{$this->route}index");
-		$routeSort->setUserId($this->getUser()->getId());
-		$routeSort->setField($field);
-		$routeSort->setValue($order);
-		
-		$entityManager->persist($routeSort);
-		$entityManager->flush();
-		
-		return $this->redirectToRoute("{$this->route}index");
-	}
-
-	/**
-	 * sort
-	 * @Route("/paginate/{field}/{value}", name="paginate", methods="GET")
-	 */
-	public function paginate(
-		EntityManagerInterface $entityManager,
-		$field,
-		$value
-	): Response
-	{
-		$routePagination = $this->routePaginationRepository->findOneBy([
-			'route' => "{$this->route}index",
-			'userId' => $this->getUser()->getId(),
-			'field' => $field,
-		]);
-		
-		if (!$routePagination) {
-			$routePagination = new $this->routePaginationEntity();
-		}
-		
-		$routePagination->setRoute("{$this->route}index");
-		$routePagination->setUserId($this->getUser()->getId());
-		$routePagination->setField($field);
-		$routePagination->setValue($value);
-		
-		$entityManager->persist($routePagination);
-		$entityManager->flush();
-		
-		return $this->redirectToRoute("{$this->route}index");
-	}
-	
-	/**
 	 * generateSearchForm
 	 * @param $data
 	 * @return \Symfony\Component\Form\FormInterface
 	 */
     private function generateSearchForm($data) {
-		$title = $this->getTitle();
+    	$route = $this->getRoute();
 		$formBuilder = $this->createFormBuilder($data);
-		$formBuilder->setAction($this->generateUrl("{$this->route}filter"));
+		$formBuilder->setAction($this->generateUrl("{$route}search"));
 	
-		foreach ($this->columns as $column) {
+		foreach ($this->getColumns() as $column) {
 			if (!isset($column['searchType'])) continue;
 		
 			$attributes = $column['attributes'];
@@ -282,7 +160,7 @@ abstract class AbstractCrudController extends Controller {
 			
 			$searchOptions['required'] = false;
 			$searchOptions['attr'] = [
-				'placeholder' => $this->trans("{$title}.{$searchLabel}")
+				'placeholder' => $this->trans($searchLabel)
 			];
 		
 			$formBuilder->add(
@@ -294,18 +172,51 @@ abstract class AbstractCrudController extends Controller {
 	
 		return $formBuilder->getForm();
 	}
+
+	/**
+     * @Route("", name="index", methods="GET")
+     */
+    public function index(Request $request, EntityManagerInterface $entityManager): Response
+    {
+		$searchData = $this->getUserData($this->routeSearchRepository);
+		$sortData = $this->getUserData($this->routeSortRepository);
+		$paginationData = $this->getUserData($this->routePaginationRepository);
+
+		if (!array_key_exists('page', $paginationData)) {
+			$paginationData['page'] = 1;
+		}
+
+		if (!array_key_exists('limit', $paginationData)) {
+			$paginationData['limit'] = 5;
+		}
+	
+		$name = $this->getName();
+		$route = $this->getRoute();
+		$form = $this->generateSearchForm($searchData);
+
+        return $this->render("{$name}/index.html.twig", [
+            'items' => $this->searchData($searchData, $sortData, $paginationData),
+            'pagination' => $paginationData,
+            'columns' => $this->getColumns(),
+            'route' => $route,
+            'title' => $name,
+			'form' => $form->createView(),
+			'sort' => $sortData
+		]);
+    }
 	
 	/**
-	 * filter
-	 * @Route("/filter", name="filter", methods="POST")
+	 * search
+	 * @Route("", name="search", methods="POST")
 	 */
-	public function filter(
+	public function search(
 		Request $request,
 		EntityManagerInterface $entityManager
 	): Response
 	{
 		$searchData = $this->getUserData($this->routeSearchRepository);
 		
+		$route = $this->getRoute();
 		$form = $this->generateSearchForm($searchData);
 		
 		$form->handleRequest($request);
@@ -316,7 +227,7 @@ abstract class AbstractCrudController extends Controller {
 			
 			$routeSearchList = $this->routeSearchRepository->findBy([
 				'userId' => $this->getUser()->getId(),
-				'route' => "{$this->route}index"
+				'route' => "{$route}index"
 			]);
 			
 			foreach ($routeSearchList as $routeSearch) {
@@ -326,7 +237,7 @@ abstract class AbstractCrudController extends Controller {
 			foreach ($searchData as $key => $value) {
 				$routeSearch = new $this->routeSearchEntity();
 				$routeSearch->setUserId($user->getId());
-				$routeSearch->setRoute("{$this->route}index");
+				$routeSearch->setRoute("{$route}index");
 				$routeSearch->setField($key);
 				$routeSearch->setValue($value);
 				
@@ -336,19 +247,20 @@ abstract class AbstractCrudController extends Controller {
 			$entityManager->flush();
 		}
 		
-		return $this->redirectToRoute("{$this->route}index");
+		return $this->redirectToRoute("{$route}index");
 	}
 
-    /**
+	/**
      * @Route("/filter/reset", name="filter_reset", methods="GET")
      */
     public function filterReset(
 		EntityManagerInterface $entityManager
 	): Response
     {
+		$route = $this->getRoute();
 		$routeSearchList = $this->routeSearchRepository->findBy([
 			'userId' => $this->getUser()->getId(),
-			'route' => "{$this->route}index"
+			'route' => "{$route}index"
 		]);
 		
 		if ($routeSearchList) {
@@ -361,7 +273,7 @@ abstract class AbstractCrudController extends Controller {
 		
 		$this->addFlash('notice', $this->trans('erased'));
     	
-		return $this->redirectToRoute("{$this->route}index");
+		return $this->redirectToRoute("{$route}index");
     }
 
     /**
@@ -369,7 +281,8 @@ abstract class AbstractCrudController extends Controller {
      */
     public function new(Request $request): Response
     {
-		return $this->generateForm($request, new $this->entity());
+		$entity = $this->getNewEntity();
+		return $this->generateForm($request, $entity);
     }
 
     /**
@@ -383,8 +296,9 @@ abstract class AbstractCrudController extends Controller {
 		$item = $this->repository->findOneBy(['id' => $id]);
 
         if (!$item) {
-            $this->addFlash('error', $this->trans('notfound'));
-            return $this->redirectToRoute("{$this->route}index");
+			$this->addFlash('error', $this->trans('notfound'));
+			$route = $this->getRoute();
+            return $this->redirectToRoute("{$route}index");
         }
 
 		return $this->generateForm($request, $item);
@@ -393,8 +307,9 @@ abstract class AbstractCrudController extends Controller {
     protected function generateForm($request, $item) {
         $classNamespace = explode('\\', get_class($item));
         $className = array_pop($classNamespace);
-        
-        $form = $this->createForm($this->form, $item);
+		$title = $this->getName();
+		$route = $this->getRoute();
+        $form = $this->createForm($this->getForm(), $item);
 
         $oldData = [];
         foreach($form->all() as $field) {
@@ -439,21 +354,19 @@ abstract class AbstractCrudController extends Controller {
 				$em->flush();
 				
 				$this->addFlash('notice', $this->trans('saved'));
-				return $this->redirectToRoute("{$this->route}index");
+				return $this->redirectToRoute("{$route}index");
 			} else {
 				foreach ($form->getErrors() as $error) {
 					$this->addFlash('error', $error->getMessage());
 				}
 			}
 		}
-	
-		$title = $this->getTitle();
 
 		return $this->render("{$title}/edit.html.twig", [
 			'item' => $item,
             'form' => $form->createView(),
-            'route' => $this->route,
-            'title' => $title,
+            'route' => $route,
+            'name' => $title,
 		]);
 	}
 
@@ -461,16 +374,18 @@ abstract class AbstractCrudController extends Controller {
      * @Route("/{id}/{field}/delete", name="delete_image", methods="GET")
      */
     public function deleteImage(
-		Request $request, 
+		Request $request,
+		EntityManagerInterface $entityManager,
 		$id,
 		$field
 	): Response
     {
 		$item = $this->repository->findOneBy(['id' => $id]);
+		$route = $this->getRoute();
 
         if (!$item) {
             $this->addFlash('error', $this->trans('notfound'));
-            return $this->redirectToRoute("{$this->route}index");
+            return $this->redirectToRoute("{$route}index");
 		}
 		
 		$getFunc="get$field";
@@ -512,5 +427,125 @@ abstract class AbstractCrudController extends Controller {
         $this->addFlash('notice', $this->trans('deleted'));
         
         return $this->redirectToRoute("{$this->route}index");
+	}
+
+	/**
+	 * sort
+	 * @Route("/paginate/{field}/{value}", name="paginate", methods="GET")
+	 */
+	public function paginate(
+		EntityManagerInterface $entityManager,
+		$field,
+		$value
+	): Response
+	{
+		$route = $this->getRoute();
+		$routePagination = $this->repository->findOneBy([
+			'route' => "{$route}index",
+			'userId' => $this->getUser()->getId(),
+			'field' => $field,
+		]);
+		
+		if (!$routePagination) {
+			$routePagination = $this->getNewEntity();
+		}
+		
+		$routePagination->setRoute($route);
+		$routePagination->setUserId($this->getUser()->getId());
+		$routePagination->setField($field);
+		$routePagination->setValue($value);
+		
+		$entityManager->persist($routePagination);
+		$entityManager->flush();
+		
+		return $this->redirectToRoute($route);
+	}
+
+	/**
+	 * reset sorting
+	 * @Route("/sort/reset", name="reset_sorting", methods="GET")
+	 */
+	public function resetSort(
+		EntityManagerInterface $entityManager
+	): Response
+	{
+		$route = $this->getRoute();
+		$routeSortingList = $this->repository->findBy([
+			'route' => "{$route}index",
+			'userId' => $this->getUser()->getId()
+		]);
+		
+		if ($routeSortingList) {
+			foreach ($routeSortingList as $routeSorting) {
+				$entityManager->remove($routeSorting);
+			}
+			
+			$entityManager->flush();
+		}
+		
+		$this->addFlash('notice', $this->trans('erased'));
+		
+		return $this->redirectToRoute($route);
+	}
+
+	/**
+	 * reset sorting field
+	 * @Route("/sort/{field}/reset", name="reset_field_sorting", methods="GET")
+	 */
+	public function resetFieldSorting(
+		EntityManagerInterface $entityManager,
+		$field
+	): Response
+	{
+		$route = $this->getRoute();
+		$routeSort = $this->repository->findOneBy([
+			'route' => "{$route}index",
+			'userId' => $this->getUser()->getId(),
+			'field' => $field,
+		]);
+		
+		if ($routeSort) {
+			$entityManager->remove($routeSort);
+			$entityManager->flush();
+		}
+		
+		return $this->redirectToRoute($route);
+	}
+	
+	/**
+	 * set sorting field
+	 * @Route("/sort/{field}/{order}", name="sort_field", methods="GET")
+	 */
+	public function sortField(
+		EntityManagerInterface $entityManager,
+		$field,
+		$order
+	): Response
+	{
+		$route = "{$this->getRoute()}index";
+
+		if ($order !== 'asc' && $order !== 'desc') {
+			return $this->redirectToRoute($route);
+		}
+
+		$routeSort = $this->repository->findOneBy([
+			'route' => $route,
+			'userId' => $this->getUser()->getId(),
+			'field' => $field,
+		]);
+		
+		if (!$routeSort) {
+			$routeSort = new $this->routeSortEntity();
+		}
+		
+		$routeSort->setRoute($route);
+		$routeSort->setUserId($this->getUser()->getId());
+		$routeSort->setField($field);
+		$routeSort->setValue($order);
+		
+		$entityManager->persist($routeSort);
+		$entityManager->flush();
+		
+		return $this->redirectToRoute($route);
 	}
 }
