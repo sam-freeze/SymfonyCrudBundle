@@ -15,14 +15,31 @@ use Symfony\Component\Yaml\Yaml;
 abstract class AbstractTranslationController extends Controller
 {
 
+	/**
+	 * controller name
+	 * translation use name
+	 */
+	protected $name;
+
+	/**
+	 * route prefix name
+	 */
+	protected $route;
+
+	/**
+	 * translation path 
+	 * to save yaml file
+	 */
+	protected $path;
+
 	function __construct(
 		TranslatorInterface $translator,
-		$title,
 		$route,
+		$name,
 		$path
 	) {
 		$this->translator = $translator;
-		$this->title = $title;
+		$this->name = $name;
 		$this->route = $route;
 		$this->path = $path;
 	}
@@ -37,16 +54,16 @@ abstract class AbstractTranslationController extends Controller
 		return $this->route;
 	}
 
-	public function getTitle(): String
+	public function getName(): String
     {
-		return $this->title;
+		return $this->name;
 	}
 
 	/**
 	 * trans key
 	 */
 	protected function trans($key) {
-		$title = $this->getTitle();
+		$title = $this->getName();
 		return $this->translator->trans("{$title}.{$key}");
 	}
 
@@ -57,7 +74,7 @@ abstract class AbstractTranslationController extends Controller
     {
 		// file path
 		$locale = $translator->getLocale();
-		$title = $this->getTitle();
+		$title = $this->getName();
 		$path = $this->getPath();
         $filePath = "$path/messages.$locale.yml";
 
@@ -87,7 +104,7 @@ abstract class AbstractTranslationController extends Controller
 		$locale = $translator->getLocale();
 		$path = $this->getPath();
 		$route = $this->getRoute();
-		$title = $this->getTitle();
+		$name = $this->getName();
 
 		// build form by group
 		$formBuilder = $this->createFormBuilder();
@@ -140,9 +157,9 @@ abstract class AbstractTranslationController extends Controller
 			}
 		}
 		
-        return $this->render("$title/edit.html.twig", [
+        return $this->render("$name/edit.html.twig", [
 			'form' => $form->createView(),
-			'title' => $title
+			'name' => $name
 		]);
     }
 
@@ -155,7 +172,7 @@ abstract class AbstractTranslationController extends Controller
 		$locale = $translator->getLocale();
 		$path = $this->getPath();
 		$route = $this->getRoute();
-		$title = $this->getTitle();
+		$title = $this->getName();
         $filePath = "$path/messages.$locale.yml";
         
 		$translations = [];
