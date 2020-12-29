@@ -65,6 +65,21 @@ abstract class AbstractCrudController extends Controller {
 	 * hook to generate a new entity
 	 */
 	abstract function getNewEntity();
+
+	/**
+	 * hook to generate route pagination entity
+	 */
+	abstract function newRoutePaginationEntity();
+
+	/**
+	 * hook to generate a new search entity
+	 */
+	abstract function newRouteSearchEntity();
+
+	/**
+	 * hook to generate route sort entity
+	 */
+	abstract function newRouteSortEntity();
 	
 	/**
 	 * get name
@@ -222,7 +237,7 @@ abstract class AbstractCrudController extends Controller {
 		$form->handleRequest($request);
 		
 		if ($form->isSubmitted()) {
-			$searchData = $form->getUserData();
+			$searchData = $form->getData();
 			$user = $this->getUser();
 			
 			$routeSearchList = $this->routeSearchRepository->findBy([
@@ -235,7 +250,7 @@ abstract class AbstractCrudController extends Controller {
 			}
 			
 			foreach ($searchData as $key => $value) {
-				$routeSearch = new $this->routeSearchEntity();
+				$routeSearch = $this->newRouteSearchEntity();
 				$routeSearch->setUserId($user->getId());
 				$routeSearch->setRoute("{$route}index");
 				$routeSearch->setField($key);
@@ -440,17 +455,17 @@ abstract class AbstractCrudController extends Controller {
 	): Response
 	{
 		$route = $this->getRoute();
-		$routePagination = $this->repository->findOneBy([
+		$routePagination = $this->routePaginationRepository->findOneBy([
 			'route' => "{$route}index",
 			'userId' => $this->getUser()->getId(),
 			'field' => $field,
 		]);
 		
 		if (!$routePagination) {
-			$routePagination = $this->getNewEntity();
+			$routePagination = $this->newRoutePaginationEntity();
 		}
 		
-		$routePagination->setRoute($route);
+		$routePagination->setRoute("{$route}index");
 		$routePagination->setUserId($this->getUser()->getId());
 		$routePagination->setField($field);
 		$routePagination->setValue($value);
@@ -458,7 +473,7 @@ abstract class AbstractCrudController extends Controller {
 		$entityManager->persist($routePagination);
 		$entityManager->flush();
 		
-		return $this->redirectToRoute($route);
+		return $this->redirectToRoute("{$route}index");
 	}
 
 	/**
@@ -470,7 +485,7 @@ abstract class AbstractCrudController extends Controller {
 	): Response
 	{
 		$route = $this->getRoute();
-		$routeSortingList = $this->repository->findBy([
+		$routeSortingList = $this->routeSortRepository->findBy([
 			'route' => "{$route}index",
 			'userId' => $this->getUser()->getId()
 		]);
@@ -485,7 +500,7 @@ abstract class AbstractCrudController extends Controller {
 		
 		$this->addFlash('notice', $this->trans('erased'));
 		
-		return $this->redirectToRoute($route);
+		return $this->redirectToRoute("{$route}index");
 	}
 
 	/**
@@ -498,7 +513,7 @@ abstract class AbstractCrudController extends Controller {
 	): Response
 	{
 		$route = $this->getRoute();
-		$routeSort = $this->repository->findOneBy([
+		$routeSort = $this->routeSortRepository->findOneBy([
 			'route' => "{$route}index",
 			'userId' => $this->getUser()->getId(),
 			'field' => $field,
@@ -509,7 +524,7 @@ abstract class AbstractCrudController extends Controller {
 			$entityManager->flush();
 		}
 		
-		return $this->redirectToRoute($route);
+		return $this->redirectToRoute("{$route}index");
 	}
 	
 	/**
@@ -528,14 +543,14 @@ abstract class AbstractCrudController extends Controller {
 			return $this->redirectToRoute($route);
 		}
 
-		$routeSort = $this->repository->findOneBy([
+		$routeSort = $this->routeSortRepository->findOneBy([
 			'route' => $route,
 			'userId' => $this->getUser()->getId(),
 			'field' => $field,
 		]);
 		
 		if (!$routeSort) {
-			$routeSort = new $this->routeSortEntity();
+			$routeSort = $this->newRouteSortEntity();
 		}
 		
 		$routeSort->setRoute($route);
