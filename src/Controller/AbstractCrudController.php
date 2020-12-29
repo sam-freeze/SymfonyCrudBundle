@@ -199,7 +199,7 @@ abstract class AbstractCrudController extends Controller {
             'pagination' => $paginationData,
             'columns' => $this->getColumns(),
             'route' => $route,
-            'title' => $name,
+            'name' => $name,
 			'form' => $form->createView(),
 			'sort' => $sortData
 		]);
