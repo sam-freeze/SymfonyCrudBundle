@@ -1,10 +1,10 @@
 {% extends 'hero.html.twig' %}
 
-{% block title %}{% if item.id %}{{ 'admin.edit'|trans({}, 'SymfonyCrudBundle') }} {% else %} {{ 'admin.create'|trans({}, 'SymfonyCrudBundle') }} {% endif %}{{ "#{name}.hero"|trans }} {% endblock %}
+{% block title %}{% if item.id %} {{ "#{name}.edit"|trans({}, 'SymfonyCrudBundle') }} {% else %} {{ "#{name}.create"|trans({}, 'SymfonyCrudBundle') }} {% endif %}{% endblock %}
 
 {% block body %}
     <div class="column is-6 is-offset-3 has-text-centered">
-        <h2 class="title">{% if item.id %}{{ 'admin.edit'|trans({}, 'SymfonyCrudBundle') }} {% else %} {{ 'admin.create'|trans({}, 'SymfonyCrudBundle') }} {% endif %} {{ "#{name}.hero"|trans }}</h2>
+        <h2 class="title">{% if item.id %} {{ "#{name}.edit"|trans({}, 'SymfonyCrudBundle') }} {% else %} {{ "#{name}.create"|trans({}, 'SymfonyCrudBundle') }} {% endif %}</h2>
 
         <div class="box">
             {% include "#{name}/_form.html.twig" %}
@@ -12,7 +12,7 @@
 
         <p>
             <a href="{{ path("#{route}index") }}">
-                {{ 'admin.back'|trans({}, 'SymfonyCrudBundle') }}
+                {{ "#{name}.back"|trans({}, 'SymfonyCrudBundle') }}
             </a>
         </p>
     </div>

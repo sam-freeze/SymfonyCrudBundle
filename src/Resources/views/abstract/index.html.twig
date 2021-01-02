@@ -1,7 +1,7 @@
 {% extends 'hero.html.twig' %}
 
-{% block name %}{{ "#{name}.hero"|trans }}{% endblock %}
-{% block heroname %}{{ "#{name}.hero"|trans }}{% endblock %}
+{% block name %}{{ "#{name}.hero"|trans({}, 'SymfonyCrudBundle') }}{% endblock %}
+{% block heroname %}{{ "#{name}.hero"|trans({}, 'SymfonyCrudBundle') }}{% endblock %}
 
 {% block body %}
     {{ form_start(form) }}
@@ -19,28 +19,28 @@
                                 <span class="icon">
                                     <i class="fas fa-sort"></i>
                                 </span>
-                                {{ "#{name}.#{column.name}"|trans }}
+                                {{ "#{name}.#{column.name}"|trans({}, 'SymfonyCrudBundle') }}
                             </a>
                         {% elseif sort[sortName] == 'asc' %}
                             <a class="has-text-dark" href="{{ path("#{route}sort_field", { 'field': sortName, 'order' : 'desc' }) }}">
                                 <span class="icon">
                                     <i class="fas fa-sort-alpha-up"></i>
                                 </span>
-                                {{ "#{name}.#{column.name}"|trans }}
+                                {{ "#{name}.#{column.name}"|trans({}, 'SymfonyCrudBundle') }}
                             </a>
                         {% elseif sort[sortName] == 'desc' %}
                             <a class="has-text-dark" href="{{ path("#{route}reset_field_sorting", { 'field': sortName }) }}">
                                 <span class="icon">
                                     <i class="fas fa-sort-alpha-down-alt"></i>
                                 </span>
-                                {{ "#{name}.#{column.name}"|trans }}
+                                {{ "#{name}.#{column.name}"|trans({}, 'SymfonyCrudBundle') }}
                             </a>
                         {% else %}
                             <a class="has-text-dark" href="{{ path("#{route}sort_field", { 'field': sortName, 'order' : 'asc' }) }}">
                                 <span class="icon">
                                     <i class="fas fa-sort"></i>
                                 </span>
-                                {{ "#{name}.#{column.name}"|trans }}
+                                {{ "#{name}.#{column.name}"|trans({}, 'SymfonyCrudBundle') }}
                             </a>
                         {% endif %}
                     </th>
@@ -99,28 +99,28 @@
                                 <span class="icon">
                                     <i class="fas fa-sort"></i>
                                 </span>
-                                {{ "#{name}.#{column.name}"|trans }}
+                                {{ "#{name}.#{column.name}"|trans({}, 'SymfonyCrudBundle') }}
                             </a>
                         {% elseif sort[sortName] == 'asc' %}
                             <a class="has-text-dark" href="{{ path("#{route}sort_field", { 'field': sortName, 'order' : 'desc' }) }}">
                                 <span class="icon">
                                     <i class="fas fa-sort-alpha-up"></i>
                                 </span>
-                                {{ "#{name}.#{column.name}"|trans }}
+                                {{ "#{name}.#{column.name}"|trans({}, 'SymfonyCrudBundle') }}
                             </a>
                         {% elseif sort[sortName] == 'desc' %}
                             <a class="has-text-dark" href="{{ path("#{route}reset_field_sorting", { 'field': sortName }) }}">
                                 <span class="icon">
                                     <i class="fas fa-sort-alpha-down-alt"></i>
                                 </span>
-                                {{ "#{name}.#{column.name}"|trans }}
+                                {{ "#{name}.#{column.name}"|trans({}, 'SymfonyCrudBundle') }}
                             </a>
                         {% else %}
                             <a class="has-text-dark" href="{{ path("#{route}sort_field", { 'field': sortName, 'order' : 'asc' }) }}">
                                 <span class="icon">
                                     <i class="fas fa-sort"></i>
                                 </span>
-                                {{ "#{name}.#{column.name}"|trans }}
+                                {{ "#{name}.#{column.name}"|trans({}, 'SymfonyCrudBundle') }}
                             </a>
                         {% endif %}
                     </th>
@@ -151,7 +151,7 @@
                                 {% endblock %}
                                 <a class="button" href="{{ path("#{route}edit", {'id': item.id}) }}">
                                     <span class="icon is-small">
-                                    <i class="far fa-edit"></i>
+                                        <i class="far fa-edit"></i>
                                     </span>
                                 </a>
                                 <a class="button" href="{{ path("#{route}delete", {'id': item.id}) }}">
@@ -166,7 +166,7 @@
             {% else %}
                 <tr>
                     <td colspan="{{ columns|length + 1 }}" class="has-text-centered has-text-primary">
-                        {{ 'admin.noresult'|trans({}, 'SymfonyCrudBundle') }}
+                        {{ "#{name}.noresult"|trans({}, 'SymfonyCrudBundle') }}
                     </td>
                 </tr>
             {% endif %}

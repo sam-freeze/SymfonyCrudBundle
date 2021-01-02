@@ -91,9 +91,9 @@
     </div>
 {% elseif column.type == 'boolean' %}
     {% if value %}
-        {{ 'rest.yes'|trans }}
+        {{ "#{name}.yes"|trans({}, 'SymfonyCrudBundle') }}
     {% else %}
-        {{ 'rest.no'|trans }}
+        {{ "#{name}.no"|trans({}, 'SymfonyCrudBundle') }}
     {% endif %}
 {% elseif column.type == 'list' %}
     {% set lastAttribute = column.attributes|last %}
@@ -103,7 +103,7 @@
         {% endfor %}
         {% if value|length > 3 %}
             <a class="tag is-link open-modal" href="{{ '#' ~ uniqkey ~ id }}">
-                {{ value|length - 3 }} {{ 'rest.more'|trans }}
+                {{ value|length - 3 }} {{ "#{name}.more"|trans({}, 'SymfonyCrudBundle') }}
             </a>
             <div class="modal" id="{{ uniqkey ~ id }}">
                 <div class="modal-background"></div>
