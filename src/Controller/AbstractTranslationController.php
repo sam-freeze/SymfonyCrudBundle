@@ -92,7 +92,7 @@ abstract class AbstractTranslationController extends Controller
 
 		return $this->render("$title/index.html.twig", [
 			'groups' => array_unique($groups),
-			'title' => $title
+			'name' => $title
 		]);
 	}
 
@@ -230,7 +230,7 @@ abstract class AbstractTranslationController extends Controller
 		
         return $this->render("$title/edit.html.twig", [
 			'form' => $form->createView(),
-			'title' => $title
+			'name' => $title
 		]);
     }
 }

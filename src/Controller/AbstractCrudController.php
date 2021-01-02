@@ -100,9 +100,9 @@ abstract class AbstractCrudController extends Controller {
 	/**
 	 * trans key
 	 */
-	protected function trans($key) {
+	protected function trans($key, $group = 'admin') {
 		$name = $this->getName();
-		return $this->translator->trans("{$name}.{$key}");
+		return $this->translator->trans("$group.$key", [], $name);
 	}
 
 	/**
@@ -175,7 +175,7 @@ abstract class AbstractCrudController extends Controller {
 			
 			$searchOptions['required'] = false;
 			$searchOptions['attr'] = [
-				'placeholder' => $this->trans($searchLabel)
+				'placeholder' => $this->trans($searchLabel, 'column')
 			];
 		
 			$formBuilder->add(

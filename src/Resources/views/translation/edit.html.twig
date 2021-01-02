@@ -1,9 +1,9 @@
 {% extends 'hero.html.twig' %}
 
-{% block title %}{{ 'admin.translation.index'|trans({}, 'SymfonyCrudBundle') }}{% endblock %}
-{% block subtitle %}{{ 'admin.translation.list'|trans({}, 'SymfonyCrudBundle') }}{% endblock %}
-{% block herotitle %}{{ 'admin.translation.index'|trans({}, 'SymfonyCrudBundle') }}{% endblock %}
-{% block herosubtitle %}{{ 'admin.translation.group'|trans({}, 'SymfonyCrudBundle') }} {{ app.request.query.get('id') }}{% endblock %}
+{% block title %}{{ 'admin.hero'|trans({}, name) }}{% endblock %}
+{% block subtitle %}{{ 'admin.hero'|trans({}, name) }}{% endblock %}
+{% block herotitle %}{{ 'admin.group'|trans({}, name) }}{% endblock %}
+{% block herosubtitle %}{{ 'admin.group'|trans({}, name) }} {{ app.request.query.get('id') }}{% endblock %}
 
 {% block body %}
     <div class="column is-6 is-offset-3 has-text-centered">
@@ -13,7 +13,7 @@
 
         <p>
             <a href="{{ path("admin_translation_index") }}">
-                {{ 'admin.back'|trans }}
+                {{ 'admin.back'|trans({}, name) }}
             </a>
         </p>
     </div>

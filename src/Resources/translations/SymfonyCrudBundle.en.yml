@@ -1,16 +1,29 @@
-admin.erased: Reseted
+# define translation used in a controller
+
+# filter
+# colomn.key:
+
+# form
+# form.key:
+
+# controller
 admin.all: All
-admin.empty: Empty
+admin.empty: No element
+admin.erased: Erased
 admin.notfound: Not found
 admin.saved: Saved
+admin.imageDeleted: Image deleted
 admin.deleted: Deleted
+
+# index
+admin.hero: Title
+admin.noresult: No result
+
+# edit
+admin.create: Create
+admin.edit: Edit
+admin.back: Back
 admin.yes: Yes
 admin.no: No
 admin.more: More
-admin.create: Create
-admin.edit: Modify
-admin.back: Back
 admin.save: Save
-admin.translation.group: Section
-admin.translation.index: Translations
-admin.noresult: No result

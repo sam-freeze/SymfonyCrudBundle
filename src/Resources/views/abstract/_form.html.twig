@@ -4,6 +4,6 @@
         <span class="icon is-small">
             <i class="fas fa-save"></i>
         </span>
-        <span>{{ "#{name}.save"|trans({}, 'SymfonyCrudBundle') }}</span>
+        <span>{{ 'admin.save'|trans({}, name) }}</span>
     </button>
 {{ form_end(form) }}

@@ -1,13 +1,13 @@
 {% extends 'hero.html.twig' %}
 
-{% block title %}{{ 'admin.translation.index'|trans({}, 'SymfonyCrudBundle') }}{% endblock %}
-{% block herotitle %}{{ 'admin.translation.index'|trans({}, 'SymfonyCrudBundle') }}{% endblock %}
+{% block title %}{{ "admin.hero"|trans({}, name) }}{% endblock %}
+{% block herotitle %}{{ "admin.hero"|trans({}, name) }}{% endblock %}
 
 {% block body %}
     <table class="table" width="100%">
         <thead>
             <tr>
-                <th>{{ 'admin.translation.group'|trans({}, 'SymfonyCrudBundle') }}</th>
+                <th>{{ "admin.group"|trans({}, name) }}</th>
                 <th class="has-text-right">
                     <a class="button" href="{{ path("admin_translation_new") }}">
                         <span class="icon is-small">
@@ -19,7 +19,7 @@
         </thead>
         <tfoot>
             <tr>
-                <th>{{ 'admin.translation.group'|trans({}, 'SymfonyCrudBundle') }}</th>
+                <th>{{ "admin.group"|trans({}, name) }}</th>
                 <th class="has-text-right">
                     <a class="button" href="{{ path("admin_translation_new") }}">
                         <span class="icon is-small">
