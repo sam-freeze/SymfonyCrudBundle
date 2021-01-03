@@ -1,7 +1,10 @@
-{% extends 'hero.html.twig' %}
+{% extends "#{name}.html.twig" %}
 
 {% block name %}{{ "admin.hero"|trans({}, name) }}{% endblock %}
-{% block heroname %}{{ "admin.hero"|trans({}, name) }}{% endblock %}
+
+{% block breadcrumb %}
+    <li><a class="is-active">{{ "admin.hero"|trans({}, name) }}</a></li>
+{% endblock %}
 
 {% block body %}
     {{ form_start(form) }}

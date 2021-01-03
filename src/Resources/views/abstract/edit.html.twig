@@ -1,6 +1,15 @@
-{% extends 'hero.html.twig' %}
+{% extends "#{name}.html.twig" %}
 
 {% block title %}{% if item.id %} {{ "admin.edit"|trans({}, name) }} {% else %} {{ "admin.create"|trans({}, name) }} {% endif %}{% endblock %}
+
+{% block breadcrumb %}
+    <li><a href="{{ path("#{route}index") }}">{{ "admin.hero"|trans({}, name) }}</a></li>
+    {% if item.id %} 
+        <li><a class="is-active">{{ "admin.edit"|trans({}, name) }}</a></li>
+    {% else %}
+        <li><a class="is-active">{{ "admin.create"|trans({}, name) }}</a></li>
+    {% endif %}
+{% endblock %}
 
 {% block body %}
     <div class="column is-6 is-offset-3 has-text-centered">
