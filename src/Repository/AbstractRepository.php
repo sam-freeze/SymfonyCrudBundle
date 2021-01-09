@@ -64,7 +64,12 @@ abstract class AbstractRepository extends ServiceEntityRepository
 				if ($i == $count - 1) {
 					if ($value == 'null') {
 						$qb->andWhere($qb->expr()->isNull("$parent.$child"));
-					} elseif($value != '') {
+					} elseif (is_array($value)) {
+						foreach ($value as $k => $v) {
+							$qb->andWhere($qb->expr()->like("$parent.$child", ":$parent$child$k"))
+								->setParameter("$parent$child$k", "%$v%");
+						}
+					} elseif(is_string($value)) {
 						$qb->andWhere($qb->expr()->like("$parent.$child", ":$parent$child"))
 							->setParameter("$parent$child", "%$value%");
 					}
@@ -99,7 +104,7 @@ abstract class AbstractRepository extends ServiceEntityRepository
 			}
 			
 		}
-		
+
 		$paginator = new Paginator($qb);
 		$paginator
 			->getQuery()
