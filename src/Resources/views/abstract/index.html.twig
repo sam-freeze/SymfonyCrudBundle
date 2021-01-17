@@ -57,11 +57,6 @@
                         </a>
                         {% block head_btn %}
                         {% endblock %}
-                        <a class="button" href="{{ path("#{route}new") }}">
-                            <span class="icon is-small">
-                                <i class="fas fa-plus"></i>
-                            </span>
-                        </a>
                     </div>
                 </th>
             </tr>
@@ -152,16 +147,6 @@
                             <div class="buttons has-addons is-right">
                                 {% block item_btn %}
                                 {% endblock %}
-                                <a class="button" href="{{ path("#{route}edit", {'id': item.id}) }}">
-                                    <span class="icon is-small">
-                                        <i class="far fa-edit"></i>
-                                    </span>
-                                </a>
-                                <a class="button" href="{{ path("#{route}delete", {'id': item.id}) }}">
-                                    <span class="icon is-small">
-                                        <i class="far fa-trash-alt"></i>
-                                    </span>
-                                </a>
                             </div>
                         </td>
                     </tr>
