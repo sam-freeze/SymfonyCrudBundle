@@ -297,7 +297,8 @@ abstract class AbstractCrudController extends Controller {
     public function new(Request $request): Response
     {
 		$entity = $this->getNewEntity();
-		return $this->generateForm($request, $entity);
+		$formType = $this->getForm();
+		return $this->generateForm($request, $formType, $entity);
     }
 
     /**
@@ -316,15 +317,15 @@ abstract class AbstractCrudController extends Controller {
             return $this->redirectToRoute("{$route}index");
         }
 
-		return $this->generateForm($request, $item);
+		return $this->generateForm($request, $formType, $item);
     }
     
-    protected function generateForm($request, $item) {
+    protected function generateForm($request, $formType, $item) {
         $classNamespace = explode('\\', get_class($item));
         $className = array_pop($classNamespace);
 		$title = $this->getName();
 		$route = $this->getRoute();
-        $form = $this->createForm($this->getForm(), $item);
+        $form = $this->createForm($formType, $item);
 
         $oldData = [];
         foreach($form->all() as $field) {
