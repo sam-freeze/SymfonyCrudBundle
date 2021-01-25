@@ -317,6 +317,7 @@ abstract class AbstractCrudController extends Controller {
             return $this->redirectToRoute("{$route}index");
         }
 
+		$formType = $this->getForm();
 		return $this->generateForm($request, $formType, $item);
     }
     
