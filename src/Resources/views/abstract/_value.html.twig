@@ -89,11 +89,13 @@
         </div>
         <button class="modal-close is-large" aria-label="close"></button>
     </div>
+{% elseif column.type == 'currency' %}
+    {{ value | format_currency }}
 {% elseif column.type == 'boolean' %}
     {% if value %}
-        {{ "#{name}.yes"|trans({}, 'SymfonyCrudBundle') }}
+        {{ "admin.yes"|trans({}, name) }}
     {% else %}
-        {{ "#{name}.no"|trans({}, 'SymfonyCrudBundle') }}
+        {{ "admin.no"|trans({}, name) }}
     {% endif %}
 {% elseif column.type == 'list' %}
     {% set lastAttribute = column.attributes|last %}
@@ -103,7 +105,7 @@
         {% endfor %}
         {% if value|length > 3 %}
             <a class="tag is-link open-modal" href="{{ '#' ~ uniqkey ~ id }}">
-                {{ value|length - 3 }} {{ "#{name}.more"|trans({}, 'SymfonyCrudBundle') }}
+                {{ value|length - 3 }} {{ "admin.more"|trans({}, name) }}
             </a>
             <div class="modal" id="{{ uniqkey ~ id }}">
                 <div class="modal-background"></div>
