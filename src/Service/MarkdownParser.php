@@ -7,8 +7,7 @@ class MarkdownParser extends \Parsedown {
     {
         $Element = parent::inlineLink($Excerpt);
 
-        $Element['element']['attributes']['class'] = 'button is-primary';
-
+        
         return $Element;
     }
 }
