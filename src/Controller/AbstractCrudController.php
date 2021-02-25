@@ -6,8 +6,10 @@ namespace SamFreeze\SymfonyCrudBundle\Controller;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
+use SamFreeze\SymfonyCrudBundle\Repository\Expr;
 use SamFreeze\SymfonyCrudBundle\Repository\AbstractRepository;
 use SamFreeze\SymfonyCrudBundle\Repository\AbstractRouteSearchRepository;
+use SamFreeze\SymfonyCrudBundle\Repository\AbstractRouteSearchOperatorRepository;
 use SamFreeze\SymfonyCrudBundle\Repository\AbstractRouteSortRepository;
 use SamFreeze\SymfonyCrudBundle\Repository\AbstractRoutePaginationRepository;
 use SamFreeze\SymfonyCrudBundle\Service\FileUploader;
@@ -17,6 +19,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,6 +34,8 @@ abstract class AbstractCrudController extends Controller {
 	protected $routeSortRepository;
 
 	protected $routeSearchRepository;
+
+	protected $routeSearchOperatorRepository;
 	
 	protected $repository;
 	
@@ -41,6 +46,7 @@ abstract class AbstractCrudController extends Controller {
 	function __construct(
 		TranslatorInterface $translator,
 		AbstractRouteSearchRepository $routeSearchRepository,
+		AbstractRouteSearchOperatorRepository $routeSearchOperatorRepository,
 		AbstractRouteSortRepository $routeSortRepository,
 		AbstractRoutePaginationRepository $routePaginationRepository,
 		AbstractRepository $repository,
@@ -49,6 +55,7 @@ abstract class AbstractCrudController extends Controller {
 	) {
 		$this->translator = $translator;
 		$this->routePaginationRepository = $routePaginationRepository;
+		$this->routeSearchOperatorRepository = $routeSearchOperatorRepository;
 		$this->routeSortRepository = $routeSortRepository;
 		$this->routeSearchRepository = $routeSearchRepository;
 		$this->repository = $repository;
@@ -75,6 +82,11 @@ abstract class AbstractCrudController extends Controller {
 	 * hook to generate a new search entity
 	 */
 	abstract function newRouteSearchEntity();
+
+	/**
+	 * hook to generate a new search entity
+	 */
+	abstract function newRouteSearchOperatorEntity();
 
 	/**
 	 * hook to generate route sort entity
@@ -106,10 +118,21 @@ abstract class AbstractCrudController extends Controller {
 	}
 
 	/**
+	 * hook end with
+	 */
+	function endsWith($haystack, $needle) {
+		$length = strlen($needle);
+		if(!$length) {
+			return true;
+		}
+		return substr( $haystack, -$length ) === $needle;
+	}
+
+	/**
 	 * hook to search data
 	 */
-	protected function searchData($searchData, $sortData, $paginationData) {
-		return $this->repository->search($searchData, $sortData, $paginationData);
+	protected function searchData($searchData, $operatorData, $sortData, $paginationData) {
+		return $this->repository->search($searchData, $operatorData, $sortData, $paginationData);
 	}
 
 	/**
@@ -155,12 +178,13 @@ abstract class AbstractCrudController extends Controller {
 			$searchType = $column['searchType'];
 			$searchName = join('_', $attributes);
 			$searchOptions = isset($column['searchOptions']) ? $column['searchOptions'] : [];
-		
+			
+			$operatorChoices = [];
+
 			switch ($searchType) {
 				case ChoiceType::class:
 					$values = [
-						$this->trans('all') => '',
-						$this->trans('empty') => 'null'
+						$this->trans('all') => ''
 					];
 					
 					foreach ($this->repository->findDistinctValues($attributes) as $value) {
@@ -168,8 +192,16 @@ abstract class AbstractCrudController extends Controller {
 					}
 					
 					$searchOptions['choices'] = $values;
+					$operatorChoices = [Expr::eq, Expr::neq, Expr::isNull, Expr::isNotNull];
+					break;
+				case NumberType::class:
+					$operatorChoices = [Expr::eq, Expr::neq, Expr::lt, Expr::lte, Expr::gt, Expr::gte, Expr::isNull, Expr::isNotNull];
+					break;
+				case TextType::class:
+					$operatorChoices = [Expr::eq, Expr::neq, Expr::like, Expr::notLike, Expr::isNull, Expr::isNotNull];
 					break;
 				default:
+					$operatorChoices = [Expr::isNull, Expr::isNotNull];
 					break;
 			}
 			
@@ -183,6 +215,24 @@ abstract class AbstractCrudController extends Controller {
 				$searchType,
 				$searchOptions
 			);
+			
+			// operator options
+			$operatorOptions = [
+				'choices' => array_combine(
+					array_map(function($value) {
+						return $this->trans($value);
+					}, $operatorChoices),
+					$operatorChoices)
+			];
+			
+			$operatorName = "{$searchName}_operator";
+			$operatorType = ChoiceType::class;
+
+			$formBuilder->add(
+				$operatorName,
+				$operatorType,
+				$operatorOptions
+			);
 		}
 	
 		return $formBuilder->getForm();
@@ -194,6 +244,7 @@ abstract class AbstractCrudController extends Controller {
     public function index(Request $request, EntityManagerInterface $entityManager): Response
     {
 		$searchData = $this->getUserData($this->routeSearchRepository);
+		$searchOperatorData = $this->getUserData($this->routeSearchOperatorRepository);
 		$sortData = $this->getUserData($this->routeSortRepository);
 		$paginationData = $this->getUserData($this->routePaginationRepository);
 
@@ -207,10 +258,10 @@ abstract class AbstractCrudController extends Controller {
 	
 		$name = $this->getName();
 		$route = $this->getRoute();
-		$form = $this->generateSearchForm($searchData);
+		$form = $this->generateSearchForm(array_merge($searchData, $searchOperatorData));
 
         return $this->render("{$name}/index.html.twig", [
-            'items' => $this->searchData($searchData, $sortData, $paginationData),
+            'items' => $this->searchData($searchData, $searchOperatorData, $sortData, $paginationData),
             'pagination' => $paginationData,
             'columns' => $this->getColumns(),
             'route' => $route,
@@ -248,15 +299,29 @@ abstract class AbstractCrudController extends Controller {
 			foreach ($routeSearchList as $routeSearch) {
 				$entityManager->remove($routeSearch);
 			}
+
+			$routeSearchOperatorList = $this->routeSearchOperatorRepository->findBy([
+				'userId' => $this->getUser()->getId(),
+				'route' => "{$route}index"
+			]);
+			
+			foreach ($routeSearchOperatorList as $routeSearchOperator) {
+				$entityManager->remove($routeSearchOperator);
+			}
 			
 			foreach ($searchData as $key => $value) {
-				$routeSearch = $this->newRouteSearchEntity();
-				$routeSearch->setUserId($user->getId());
-				$routeSearch->setRoute("{$route}index");
-				$routeSearch->setField($key);
-				$routeSearch->setValue($value);
+				if ($this->endsWith($key, '_operator')) {
+					$entity = $this->newRouteSearchOperatorEntity();
+				} else {
+					$entity = $this->newRouteSearchEntity();
+				}
 				
-				$entityManager->persist($routeSearch);
+				$entity->setUserId($user->getId());
+				$entity->setRoute("{$route}index");
+				$entity->setField($key);
+				$entity->setValue($value);
+				
+				$entityManager->persist($entity);
 			}
 			
 			$entityManager->flush();

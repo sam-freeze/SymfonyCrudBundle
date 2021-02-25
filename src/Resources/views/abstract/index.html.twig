@@ -64,9 +64,19 @@
                 {% for column in columns %}
                     <th {% if loop.index > 2 %} class="is-hidden-mobile" {% endif %}>
                         {% set searchName = column.attributes|join('_') %}
-                        {% if form[searchName] is defined %}
-                            {{ form_widget(form[searchName]) }}
-                        {% endif %}
+                        {% set operatorName = column.attributes|join('_') ~ '_operator' %}
+                        <div class="field has-addons">
+                            <div class="control">
+                                {% if form[searchName] is defined %}
+                                    {{ form_widget(form[searchName]) }}
+                                {% endif %}
+                            </div>
+                            <div class="control">
+                                {% if form[operatorName] is defined %}
+                                    {{ form_widget(form[operatorName]) }}
+                                {% endif %}
+                            </div>
+                        </div>
                     </th>
                 {% endfor %}
                 <th>
