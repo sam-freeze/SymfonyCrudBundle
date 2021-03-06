@@ -7,176 +7,227 @@
 {% endblock %}
 
 {% block body %}
-    {{ form_start(form) }}
-
-    <table class="table is-striped" width="100%">
-        <thead>
-            <tr>
-                {% for column in columns %}
-                    <th {% if loop.index > 2 %} class="is-hidden-mobile" {% endif %}>
-                        
-                        {% set sortName = column.attributes|join('_') %}
-
-                        {% if sort[sortName] is not defined %}
-                            <a class="has-text-dark" href="{{ path("#{route}sort_field", { 'field': sortName, 'order' : 'asc' }) }}">
-                                <span class="icon">
-                                    <i class="fas fa-sort"></i>
-                                </span>
-                                {{ "column.#{column.name}"|trans({}, name) }}
-                            </a>
-                        {% elseif sort[sortName] == 'asc' %}
-                            <a class="has-text-dark" href="{{ path("#{route}sort_field", { 'field': sortName, 'order' : 'desc' }) }}">
-                                <span class="icon">
-                                    <i class="fas fa-sort-alpha-up"></i>
-                                </span>
-                                {{ "column.#{column.name}"|trans({}, name) }}
-                            </a>
-                        {% elseif sort[sortName] == 'desc' %}
-                            <a class="has-text-dark" href="{{ path("#{route}reset_field_sorting", { 'field': sortName }) }}">
-                                <span class="icon">
-                                    <i class="fas fa-sort-alpha-down-alt"></i>
-                                </span>
-                                {{ "column.#{column.name}"|trans({}, name) }}
-                            </a>
-                        {% else %}
-                            <a class="has-text-dark" href="{{ path("#{route}sort_field", { 'field': sortName, 'order' : 'asc' }) }}">
-                                <span class="icon">
-                                    <i class="fas fa-sort"></i>
-                                </span>
-                                {{ "column.#{column.name}"|trans({}, name) }}
-                            </a>
-                        {% endif %}
-                    </th>
-                {% endfor %}
-                <th>
-                    <div class="buttons has-addons is-right">
-                        <a class="button" href="{{ path("#{route}reset_sorting") }}">
-                            <span class="icon">
-                                <i class="fas fa-eraser"></i>
-                            </span>
-                        </a>
-                        {% block head_btn %}
-                        {% endblock %}
-                    </div>
-                </th>
-            </tr>
-            <tr>
-                {% for column in columns %}
-                    <th {% if loop.index > 2 %} class="is-hidden-mobile" {% endif %}>
-                        {% set searchName = column.attributes|join('_') %}
-                        {% set operatorName = column.attributes|join('_') ~ '_operator' %}
-                        <div class="field has-addons">
-                            <div class="control">
-                                {% if form[searchName] is defined %}
-                                    {{ form_widget(form[searchName]) }}
-                                {% endif %}
-                            </div>
-                            <div class="control">
-                                {% if form[operatorName] is defined %}
-                                    {{ form_widget(form[operatorName]) }}
-                                {% endif %}
-                            </div>
+    <div class="box">
+        {{ form_start(form) }}
+        <div class="columns is-multiline is-mobile">
+            {% for column in columns %}
+                <div class="column is-6-mobile is-6-tablet is-4-desktop is-3-fullscreen is-3-widescreen">
+                    {% set searchName = column.attributes|join('_') %}
+                    {% set operatorName = column.attributes|join('_') ~ '_operator' %}
+                    <div class="field has-addons">
+                        <div class="control is-expanded">
+                            {% if form[searchName] is defined %}
+                                {{ form_widget(form[searchName]) }}
+                            {% endif %}
                         </div>
-                    </th>
-                {% endfor %}
-                <th>
-                    <div class="buttons has-addons is-right">
-                        <a class="button" href="{{ path("#{route}filter_reset") }}">
-                            <span class="icon is-small">
-                                <i class="fas fa-eraser"></i>
-                            </span>
-                        </a>
-                        <button type="submit" class="button">
-                            <span class="icon is-small">
-                                <i class="fas fa-search"></i>
-                            </span>
-                        </button>
+                        <div class="control">
+                            {% if form[operatorName] is defined %}
+                                {{ form_widget(form[operatorName]) }}
+                            {% endif %}
+                        </div>
                     </div>
-                </th>
-            </tr>
-        </thead>
-        <tfoot>
-            <tr>
-                {% for column in columns %}
-                    <th {% if loop.index > 2 %} class="is-hidden-mobile" {% endif %}>
-                        
-                        {% set sortName = column.attributes|join('_') %}
-
-                        {% if sort[sortName] is not defined %}
-                            <a class="has-text-dark" href="{{ path("#{route}sort_field", { 'field': sortName, 'order' : 'asc' }) }}">
-                                <span class="icon">
-                                    <i class="fas fa-sort"></i>
-                                </span>
-                                {{ "column.#{column.name}"|trans({}, name) }}
-                            </a>
-                        {% elseif sort[sortName] == 'asc' %}
-                            <a class="has-text-dark" href="{{ path("#{route}sort_field", { 'field': sortName, 'order' : 'desc' }) }}">
-                                <span class="icon">
-                                    <i class="fas fa-sort-alpha-up"></i>
-                                </span>
-                                {{ "column.#{column.name}"|trans({}, name) }}
-                            </a>
-                        {% elseif sort[sortName] == 'desc' %}
-                            <a class="has-text-dark" href="{{ path("#{route}reset_field_sorting", { 'field': sortName }) }}">
-                                <span class="icon">
-                                    <i class="fas fa-sort-alpha-down-alt"></i>
-                                </span>
-                                {{ "column.#{column.name}"|trans({}, name) }}
-                            </a>
-                        {% else %}
-                            <a class="has-text-dark" href="{{ path("#{route}sort_field", { 'field': sortName, 'order' : 'asc' }) }}">
-                                <span class="icon">
-                                    <i class="fas fa-sort"></i>
-                                </span>
-                                {{ "column.#{column.name}"|trans({}, name) }}
-                            </a>
-                        {% endif %}
-                    </th>
-                {% endfor %}
-                <th class="has-text-right">
-                    <div class="select is-fullwidth">
-                        <select onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">
-                            {% for i in range(5, 50, 5) %}
-                                <option value="{{ path("#{route}paginate", {'field': 'limit', 'value': i}) }}" {{ i == pagination.limit ? 'selected' : null }}>{{ i }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </th>
-            </tr>
-        </tfoot>
-        <tbody>
-            {% if items|length > 0 %}
-                {% for item in items %}
-                    <tr>
+                </div>
+            {% endfor %}
+            <div class="column is-12 has-text-right">
+                <a class="button" href="{{ path("#{route}filter_reset") }}">
+                    <span class="icon is-small">
+                        <i class="fas fa-eraser"></i>
+                    </span>
+                </a>
+                <button type="submit" class="button">
+                    <span class="icon is-small">
+                        <i class="fas fa-search"></i>
+                    </span>
+                </button>
+            </div>
+        </div>
+        {{ form_end(form) }}
+    </div>
+    <div class="box">
+        <div class="has-text-right has-margin-bottom-10">
+            <div class="dropdown is-right is-hoverable">
+                <div class="dropdown-trigger">
+                    <a class="button">
+                        <span class="icon is-small">
+                            <i class="fas fa-columns"></i>
+                        </span>
+                    </a>
+                </div>
+                <div class="dropdown-menu">
+                    <div class="dropdown-content has-text-left">
                         {% for column in columns %}
-                            <td {% if loop.index > 2 %} class="is-hidden-mobile" {% endif %}>
-                                {% include "#{name}/_value.html.twig" with { 'value': item, 'column': column } %}
-                            </td>
+                            {% if column in dColumns %}
+                                <a class="dropdown-item" href="{{ path("#{route}column", { 'field': column.name, 'value' : 0 }) }}">
+                                    <span class="icon">
+                                        <i class="far fa-check-square"></i>
+                                    </span>
+                                    <span>{{ "column.#{column.name}"|trans({}, name) }}</span>
+                                </a>
+                            {% else %}
+                                <a class="dropdown-item" href="{{ path("#{route}column", { 'field': column.name, 'value' : 1 }) }}">
+                                    <span class="icon">
+                                        <i class="far fa-square"></i>
+                                    </span>
+                                    <span>{{ "column.#{column.name}"|trans({}, name) }}</span>
+                                </a>
+                            {% endif %}
                         {% endfor %}
-                        <td>
-                            <div class="buttons has-addons is-right">
-                                {% block item_btn %}
-                                {% endblock %}
-                            </div>
-                        </td>
-                    </tr>
-                {% endfor %}
-            {% else %}
-                <tr>
-                    <td colspan="{{ columns|length + 1 }}" class="has-text-centered has-text-primary">
-                        {{ "admin.noresult"|trans({}, name) }}
-                    </td>
-                </tr>
-            {% endif %}
-        </tbody>
-    </table>
+                    </div>
+                </div>
+            </div>
+            <a class="button">
+                <span class="icon">
+                    <i class="fas fa-filter"></i>
+                </span>
+            </a>
+            {% block head_btn %}
+            {% endblock %}
+        </div>
 
-    <div class="columns">
-        <div class="column is-12">
-            {% include "#{name}/_pagination.html.twig" with { 'pagination': pagination, 'count': items.count, 'route': route } only %}
+        <div class="table-wrapper has-margin-bottom-10">
+            <table class="table is-striped">
+                <thead>
+                    <tr>
+                        {% for column in dColumns %}
+                            <th>
+                                {% set sortName = column.attributes|join('_') %}
+
+                                {% if sort[sortName] is not defined %}
+                                    <a class="has-text-dark" href="{{ path("#{route}sort_field", { 'field': sortName, 'order' : 'asc' }) }}">
+                                        <span class="icon">
+                                            <i class="fas fa-sort"></i>
+                                        </span>
+                                        {{ "column.#{column.name}"|trans({}, name) }}
+                                    </a>
+                                {% elseif sort[sortName] == 'asc' %}
+                                    <a class="has-text-dark" href="{{ path("#{route}sort_field", { 'field': sortName, 'order' : 'desc' }) }}">
+                                        <span class="icon">
+                                            <i class="fas fa-sort-alpha-up"></i>
+                                        </span>
+                                        {{ "column.#{column.name}"|trans({}, name) }}
+                                    </a>
+                                {% elseif sort[sortName] == 'desc' %}
+                                    <a class="has-text-dark" href="{{ path("#{route}reset_field_sorting", { 'field': sortName }) }}">
+                                        <span class="icon">
+                                            <i class="fas fa-sort-alpha-down-alt"></i>
+                                        </span>
+                                        {{ "column.#{column.name}"|trans({}, name) }}
+                                    </a>
+                                {% else %}
+                                    <a class="has-text-dark" href="{{ path("#{route}sort_field", { 'field': sortName, 'order' : 'asc' }) }}">
+                                        <span class="icon">
+                                            <i class="fas fa-sort"></i>
+                                        </span>
+                                        {{ "column.#{column.name}"|trans({}, name) }}
+                                    </a>
+                                {% endif %}
+                            </th>
+                        {% endfor %}
+                        <th>
+                            <div class="buttons has-addons is-right">
+                                <a class="button" href="{{ path("#{route}reset_sorting") }}">
+                                    <span class="icon">
+                                        <i class="fas fa-eraser"></i>
+                                    </span>
+                                </a>
+                            </div>
+                        </th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        {% for column in dColumns %}
+                            <th>
+                                {% set sortName = column.attributes|join('_') %}
+
+                                {% if sort[sortName] is not defined %}
+                                    <a class="has-text-dark" href="{{ path("#{route}sort_field", { 'field': sortName, 'order' : 'asc' }) }}">
+                                        <span class="icon">
+                                            <i class="fas fa-sort"></i>
+                                        </span>
+                                        {{ "column.#{column.name}"|trans({}, name) }}
+                                    </a>
+                                {% elseif sort[sortName] == 'asc' %}
+                                    <a class="has-text-dark" href="{{ path("#{route}sort_field", { 'field': sortName, 'order' : 'desc' }) }}">
+                                        <span class="icon">
+                                            <i class="fas fa-sort-alpha-up"></i>
+                                        </span>
+                                        {{ "column.#{column.name}"|trans({}, name) }}
+                                    </a>
+                                {% elseif sort[sortName] == 'desc' %}
+                                    <a class="has-text-dark" href="{{ path("#{route}reset_field_sorting", { 'field': sortName }) }}">
+                                        <span class="icon">
+                                            <i class="fas fa-sort-alpha-down-alt"></i>
+                                        </span>
+                                        {{ "column.#{column.name}"|trans({}, name) }}
+                                    </a>
+                                {% else %}
+                                    <a class="has-text-dark" href="{{ path("#{route}sort_field", { 'field': sortName, 'order' : 'asc' }) }}">
+                                        <span class="icon">
+                                            <i class="fas fa-sort"></i>
+                                        </span>
+                                        {{ "column.#{column.name}"|trans({}, name) }}
+                                    </a>
+                                {% endif %}
+                            </th>
+                        {% endfor %}
+                        <th class="has-text-right">
+                            {% set countItem = items|length %}
+                            {% set startItem = ((pagination.page - 1) * pagination.limit) + 1 %}
+                            {% set endItem = (pagination.page * pagination.limit) %}
+
+                            {% if startItem > countItem %}
+                                {% set startItem = 0 %}
+                                {% set endItem = 0 %}
+                            {% elseif endItem > countItem %}
+                                {% set endItem = countItem %}
+                            {% endif %}
+                            
+                            {{ startItem }} - {{ endItem }} / {{ countItem }}
+                        </th>
+                    </tr>
+                </tfoot>
+                <tbody>
+                    {% if items|length > 0 %}
+                        {% for item in items %}
+                            <tr>
+                                {% for column in dColumns %}
+                                    <td>
+                                        {% include "#{name}/_value.html.twig" with { 'value': item, 'column': column } %}
+                                    </td>
+                                {% endfor %}
+                                <td>
+                                    <div class="buttons has-addons is-right">
+                                        {% block item_btn %}
+                                        {% endblock %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="{{ dColumns|length + 1 }}" class="has-text-centered has-text-primary">
+                                {{ "admin.noresult"|trans({}, name) }}
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="columns">
+            <div class="column is-12-mobile is-9-tablet is-10-desktop">
+                {% include "#{name}/_pagination.html.twig" with { 'pagination': pagination, 'count': items.count, 'route': route } only %}
+            </div>
+            <div class="column is-12-mobile is-3-tablet is-2-desktop">
+                <div class="select is-fullwidth">
+                    <select onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">
+                        {% for i in range(5, 50, 5) %}
+                            <option value="{{ path("#{route}paginate", {'field': 'limit', 'value': i}) }}" {{ i == pagination.limit ? 'selected' : null }}>{{ i }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
         </div>
     </div>
-
-
-    {{ form_end(form) }}
 {% endblock %}

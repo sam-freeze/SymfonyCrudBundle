@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use SamFreeze\SymfonyCrudBundle\Repository\Expr;
 use SamFreeze\SymfonyCrudBundle\Repository\AbstractRepository;
+use SamFreeze\SymfonyCrudBundle\Repository\AbstractRouteColumnRepository;
 use SamFreeze\SymfonyCrudBundle\Repository\AbstractRouteSearchRepository;
 use SamFreeze\SymfonyCrudBundle\Repository\AbstractRouteSearchOperatorRepository;
 use SamFreeze\SymfonyCrudBundle\Repository\AbstractRouteSortRepository;
@@ -33,6 +34,8 @@ abstract class AbstractCrudController extends Controller {
 
 	protected $routeSortRepository;
 
+	protected $routeColumnRepository;
+	
 	protected $routeSearchRepository;
 
 	protected $routeSearchOperatorRepository;
@@ -45,6 +48,7 @@ abstract class AbstractCrudController extends Controller {
 	
 	function __construct(
 		TranslatorInterface $translator,
+		AbstractRouteColumnRepository $routeColumnRepository,
 		AbstractRouteSearchRepository $routeSearchRepository,
 		AbstractRouteSearchOperatorRepository $routeSearchOperatorRepository,
 		AbstractRouteSortRepository $routeSortRepository,
@@ -54,6 +58,7 @@ abstract class AbstractCrudController extends Controller {
 		$name
 	) {
 		$this->translator = $translator;
+		$this->routeColumnRepository = $routeColumnRepository;
 		$this->routePaginationRepository = $routePaginationRepository;
 		$this->routeSearchOperatorRepository = $routeSearchOperatorRepository;
 		$this->routeSortRepository = $routeSortRepository;
@@ -82,6 +87,11 @@ abstract class AbstractCrudController extends Controller {
 	 * hook to generate a new search entity
 	 */
 	abstract function newRouteSearchEntity();
+
+	/**
+	 * hook to generate a new search entity
+	 */
+	abstract function newRouteColumnEntity();
 
 	/**
 	 * hook to generate a new search entity
@@ -136,6 +146,27 @@ abstract class AbstractCrudController extends Controller {
 	}
 
 	/**
+	 * get displayed columns
+	 */
+	protected function getDisplayedColumns($columnData) {
+		$columns = $this->getColumns();
+		$displayedColumns = [];
+
+		foreach ($columns as $column) {
+			$name = $column['name'];
+			if (isset($columnData[$name])) {
+				if ($columnData[$name] > 0) {
+					$displayedColumns[] = $column;
+				}
+			} else {
+				$displayedColumns[] = $column;
+			}
+		}
+
+		return $displayedColumns;
+	}
+
+	/**
 	 * get user data from repository
 	 * @param $repo
 	 * @param $route
@@ -165,12 +196,12 @@ abstract class AbstractCrudController extends Controller {
 	 * @param $data
 	 * @return \Symfony\Component\Form\FormInterface
 	 */
-    private function generateSearchForm($data) {
+    private function generateSearchForm($columns, $data) {
     	$route = $this->getRoute();
 		$formBuilder = $this->createFormBuilder($data);
 		$formBuilder->setAction($this->generateUrl("{$route}search"));
 	
-		foreach ($this->getColumns() as $column) {
+		foreach ($columns as $column) {
 			if (!isset($column['searchType'])) continue;
 		
 			$attributes = $column['attributes'];
@@ -205,6 +236,7 @@ abstract class AbstractCrudController extends Controller {
 					break;
 			}
 			
+			$searchOptions['label'] = $this->trans($searchLabel, 'column');
 			$searchOptions['required'] = false;
 			$searchOptions['attr'] = [
 				'placeholder' => $this->trans($searchLabel, 'column')
@@ -243,6 +275,7 @@ abstract class AbstractCrudController extends Controller {
      */
     public function index(Request $request, EntityManagerInterface $entityManager): Response
     {
+		$columnData = $this->getUserData($this->routeColumnRepository);
 		$searchData = $this->getUserData($this->routeSearchRepository);
 		$searchOperatorData = $this->getUserData($this->routeSearchOperatorRepository);
 		$sortData = $this->getUserData($this->routeSortRepository);
@@ -258,12 +291,16 @@ abstract class AbstractCrudController extends Controller {
 	
 		$name = $this->getName();
 		$route = $this->getRoute();
-		$form = $this->generateSearchForm(array_merge($searchData, $searchOperatorData));
+		$columns = $this->getColumns();
+		$dColumns = $this->getDisplayedColumns($columnData);
+		$form = $this->generateSearchForm($columns, array_merge($searchData, $searchOperatorData));
 
         return $this->render("{$name}/index.html.twig", [
             'items' => $this->searchData($searchData, $searchOperatorData, $sortData, $paginationData),
-            'pagination' => $paginationData,
-            'columns' => $this->getColumns(),
+            'columnData' => $columnData,
+			'pagination' => $paginationData,
+            'columns' => $columns,
+			'dColumns' => $dColumns,
             'route' => $route,
             'name' => $name,
 			'form' => $form->createView(),
@@ -281,9 +318,11 @@ abstract class AbstractCrudController extends Controller {
 	): Response
 	{
 		$searchData = $this->getUserData($this->routeSearchRepository);
+		$columnData = $this->getUserData($this->routeColumnRepository);
+		$columns = $this->getDisplayedColumns($columnData);
 		
 		$route = $this->getRoute();
-		$form = $this->generateSearchForm($searchData);
+		$form = $this->generateSearchForm($columns, $searchData);
 		
 		$form->handleRequest($request);
 		
@@ -538,6 +577,38 @@ abstract class AbstractCrudController extends Controller {
 		$routePagination->setValue($value);
 		
 		$entityManager->persist($routePagination);
+		$entityManager->flush();
+		
+		return $this->redirectToRoute("{$route}index");
+	}
+
+	/**
+	 * display column
+	 * @Route("/column/{field}/{value}", name="column", methods="GET")
+	 */
+	public function column(
+		EntityManagerInterface $entityManager,
+		$field,
+		$value
+	): Response
+	{
+		$route = $this->getRoute();
+		$routeColumn = $this->routeColumnRepository->findOneBy([
+			'route' => "{$route}index",
+			'userId' => $this->getUser()->getId(),
+			'field' => $field,
+		]);
+		
+		if (!$routeColumn) {
+			$routeColumn = $this->newRouteColumnEntity();
+		}
+		
+		$routeColumn->setRoute("{$route}index");
+		$routeColumn->setUserId($this->getUser()->getId());
+		$routeColumn->setField($field);
+		$routeColumn->setValue($value);
+		
+		$entityManager->persist($routeColumn);
 		$entityManager->flush();
 		
 		return $this->redirectToRoute("{$route}index");
