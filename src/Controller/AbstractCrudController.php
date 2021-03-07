@@ -319,7 +319,7 @@ abstract class AbstractCrudController extends Controller {
 	{
 		$searchData = $this->getUserData($this->routeSearchRepository);
 		$columnData = $this->getUserData($this->routeColumnRepository);
-		$columns = $this->getDisplayedColumns($columnData);
+		$columns = $this->getColumns();
 		
 		$route = $this->getRoute();
 		$form = $this->generateSearchForm($columns, $searchData);
@@ -385,6 +385,19 @@ abstract class AbstractCrudController extends Controller {
 		if ($routeSearchList) {
 			foreach ($routeSearchList as $routeSearch) {
 				$entityManager->remove($routeSearch);
+			}
+			
+			$entityManager->flush();
+		}
+
+		$routeSearchOperatorList = $this->routeSearchOperatorRepository->findBy([
+			'userId' => $this->getUser()->getId(),
+			'route' => "{$route}index"
+		]);
+		
+		if ($routeSearchOperatorList) {
+			foreach ($routeSearchOperatorList as $routeSearchOperator) {
+				$entityManager->remove($routeSearchOperator);
 			}
 			
 			$entityManager->flush();
