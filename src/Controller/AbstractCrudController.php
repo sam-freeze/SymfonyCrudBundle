@@ -298,7 +298,10 @@ abstract class AbstractCrudController extends Controller {
         return $this->render("{$name}/index.html.twig", [
             'items' => $this->searchData($searchData, $searchOperatorData, $sortData, $paginationData),
             'columnData' => $columnData,
-			'pagination' => $paginationData,
+			'searchData' => $searchData,
+			'searchOperatorData' => $searchOperatorData,
+			'sortData' => $sortData,
+			'paginationData' => $paginationData,
             'columns' => $columns,
 			'dColumns' => $dColumns,
             'route' => $route,

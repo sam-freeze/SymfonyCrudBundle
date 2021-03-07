@@ -38,6 +38,22 @@
                 </div>
             </div>
         </div>
+        {% set searchKeys = searchData|filter(v => v is not empty)|map((v, k) => k) %}
+        {% set requiredOperator = ['isNull', 'isNotNull'] %}
+        {% set searchOperatorKeys = searchOperatorData|filter((v, k) => v in requiredOperator)|map((v, k) => k) %}
+        {% if searchKeys|length or searchOperatorKeys|length %}
+            <a class="button is-primary is-outlined">
+                <span class="icon is-small">
+                    <i class="fas fa-filter"></i>
+                </span>
+            </a>
+        {% else %}
+            <a class="button">
+                <span class="icon is-small">
+                    <i class="fas fa-filter"></i>
+                </span>
+            </a>
+        {% endif %}
         {% block head_btn %}
         {% endblock %}
     </div>
@@ -172,8 +188,8 @@
                     {% endfor %}
                     <th class="has-text-right">
                         {% set countItem = items|length %}
-                        {% set startItem = ((pagination.page - 1) * pagination.limit) + 1 %}
-                        {% set endItem = (pagination.page * pagination.limit) %}
+                        {% set startItem = ((paginationData.page - 1) * paginationData.limit) + 1 %}
+                        {% set endItem = (paginationData.page * paginationData.limit) %}
 
                         {% if startItem > countItem %}
                             {% set startItem = 0 %}
@@ -216,13 +232,13 @@
 
     <div class="columns">
         <div class="column is-12-mobile is-9-tablet is-10-desktop">
-            {% include "#{name}/_pagination.html.twig" with { 'pagination': pagination, 'count': items.count, 'route': route } only %}
+            {% include "#{name}/_pagination.html.twig" with { 'pagination': paginationData, 'count': items.count, 'route': route } only %}
         </div>
         <div class="column is-12-mobile is-3-tablet is-2-desktop">
             <div class="select is-fullwidth">
                 <select onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">
                     {% for i in range(5, 50, 5) %}
-                        <option value="{{ path("#{route}paginate", {'field': 'limit', 'value': i}) }}" {{ i == pagination.limit ? 'selected' : null }}>{{ i }}</option>
+                        <option value="{{ path("#{route}paginate", {'field': 'limit', 'value': i}) }}" {{ i == paginationData.limit ? 'selected' : null }}>{{ i }}</option>
                     {% endfor %}
                 </select>
             </div>
