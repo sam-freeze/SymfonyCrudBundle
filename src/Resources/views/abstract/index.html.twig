@@ -20,14 +20,14 @@
                 <div class="dropdown-content has-text-left">
                     {% for column in columns %}
                         {% if column in dColumns %}
-                            <a class="dropdown-item" href="{{ path("#{route}column", { 'field': column.name, 'value' : 0 }) }}">
+                            <a class="dropdown-item" href="{{ path("column", { 'route': app.request.get('_route'), 'field': column.name, 'value' : 0 }) }}">
                                 <span class="icon">
                                     <i class="far fa-check-square"></i>
                                 </span>
                                 <span>{{ "column.#{column.name}"|trans({}, name) }}</span>
                             </a>
                         {% else %}
-                            <a class="dropdown-item" href="{{ path("#{route}column", { 'field': column.name, 'value' : 1 }) }}">
+                            <a class="dropdown-item" href="{{ path("column", { 'route': app.request.get('_route'), 'field': column.name, 'value' : 1 }) }}">
                                 <span class="icon">
                                     <i class="far fa-square"></i>
                                 </span>
@@ -58,46 +58,7 @@
         {% endblock %}
     </div>
 
-    {{ form_start(form) }}
-        <div class="columns is-multiline is-mobile">
-            {% for column in columns %}
-                {% set searchName = column.attributes|join('_') %}
-                {% set operatorName = column.attributes|join('_') ~ '_operator' %}
-                {% if form[searchName] is defined and form[operatorName] is defined %}
-                    <div class="column is-6-mobile is-6-tablet is-4-desktop is-3-fullscreen is-3-widescreen">
-                        <div class="field has-addons">
-                            <div class="control is-expanded">
-                                {{ form_widget(form[searchName]) }} 
-                            </div>
-                            <div class="control">
-                                {{ form_widget(form[operatorName]) }}
-                            </div>
-                        </div>
-                    </div>
-                {% elseif form[operatorName] is defined %}
-                    <div class="column is-6-mobile is-6-tablet is-4-desktop is-3-fullscreen is-3-widescreen">
-                        <div class="field">
-                            <div class="control">
-                                {{ form_widget(form[operatorName]) }}
-                            </div>
-                        </div>
-                    </div>
-                {% endif %}
-            {% endfor %}
-            <div class="column is-12 has-text-right">
-                <a class="button" href="{{ path("#{route}filter_reset") }}">
-                    <span class="icon is-small">
-                        <i class="fas fa-eraser"></i>
-                    </span>
-                </a>
-                <button type="submit" class="button">
-                    <span class="icon is-small">
-                        <i class="fas fa-search"></i>
-                    </span>
-                </button>
-            </div>
-        </div>
-    {{ form_end(form) }}
+
 
     <div class="table-wrapper has-margin-bottom-10">
         <table class="table is-striped">
@@ -107,29 +68,29 @@
                         <th>
                             {% set sortName = column.attributes|join('_') %}
 
-                            {% if sort[sortName] is not defined %}
-                                <a class="has-text-dark" href="{{ path("#{route}sort_field", { 'field': sortName, 'order' : 'asc' }) }}">
+                            {% if sortData[sortName] is not defined %}
+                                <a class="has-text-dark" href="{{ path("sort_field", { 'route': app.request.get('_route'), 'field': sortName, 'order' : 'asc' }) }}">
                                     <span class="icon">
                                         <i class="fas fa-sort"></i>
                                     </span>
                                     {{ "column.#{column.name}"|trans({}, name) }}
                                 </a>
-                            {% elseif sort[sortName] == 'asc' %}
-                                <a class="has-text-dark" href="{{ path("#{route}sort_field", { 'field': sortName, 'order' : 'desc' }) }}">
+                            {% elseif sortData[sortName] == 'asc' %}
+                                <a class="has-text-dark" href="{{ path("sort_field", { 'route': app.request.get('_route'), 'field': sortName, 'order' : 'desc' }) }}">
                                     <span class="icon">
                                         <i class="fas fa-sort-alpha-up"></i>
                                     </span>
                                     {{ "column.#{column.name}"|trans({}, name) }}
                                 </a>
-                            {% elseif sort[sortName] == 'desc' %}
-                                <a class="has-text-dark" href="{{ path("#{route}reset_field_sorting", { 'field': sortName }) }}">
+                            {% elseif sortData[sortName] == 'desc' %}
+                                <a class="has-text-dark" href="{{ path("sort_reset_field", { 'route': app.request.get('_route'), 'field': sortName }) }}">
                                     <span class="icon">
                                         <i class="fas fa-sort-alpha-down-alt"></i>
                                     </span>
                                     {{ "column.#{column.name}"|trans({}, name) }}
                                 </a>
                             {% else %}
-                                <a class="has-text-dark" href="{{ path("#{route}sort_field", { 'field': sortName, 'order' : 'asc' }) }}">
+                                <a class="has-text-dark" href="{{ path("sort_field", { 'route': app.request.get('_route'), 'field': sortName, 'order' : 'asc' }) }}">
                                     <span class="icon">
                                         <i class="fas fa-sort"></i>
                                     </span>
@@ -140,7 +101,7 @@
                     {% endfor %}
                     <th>
                         <div class="buttons has-addons is-right">
-                            <a class="button" href="{{ path("#{route}reset_sorting") }}">
+                            <a class="button" href="{{ path("sort_reset", { 'route': app.request.get('_route') }) }}">
                                 <span class="icon">
                                     <i class="fas fa-eraser"></i>
                                 </span>
@@ -155,29 +116,29 @@
                         <th>
                             {% set sortName = column.attributes|join('_') %}
 
-                            {% if sort[sortName] is not defined %}
-                                <a class="has-text-dark" href="{{ path("#{route}sort_field", { 'field': sortName, 'order' : 'asc' }) }}">
+                            {% if sortData[sortName] is not defined %}
+                                <a class="has-text-dark" href="{{ path("sort_field", { 'route': app.request.get('_route'), 'field': sortName, 'order' : 'asc' }) }}">
                                     <span class="icon">
                                         <i class="fas fa-sort"></i>
                                     </span>
                                     {{ "column.#{column.name}"|trans({}, name) }}
                                 </a>
-                            {% elseif sort[sortName] == 'asc' %}
-                                <a class="has-text-dark" href="{{ path("#{route}sort_field", { 'field': sortName, 'order' : 'desc' }) }}">
+                            {% elseif sortData[sortName] == 'asc' %}
+                                <a class="has-text-dark" href="{{ path("sort_field", { 'route': app.request.get('_route'), 'field': sortName, 'order' : 'desc' }) }}">
                                     <span class="icon">
                                         <i class="fas fa-sort-alpha-up"></i>
                                     </span>
                                     {{ "column.#{column.name}"|trans({}, name) }}
                                 </a>
-                            {% elseif sort[sortName] == 'desc' %}
-                                <a class="has-text-dark" href="{{ path("#{route}reset_field_sorting", { 'field': sortName }) }}">
+                            {% elseif sortData[sortName] == 'desc' %}
+                                <a class="has-text-dark" href="{{ path("sort_reset_field", { 'route': app.request.get('_route'), 'field': sortName }) }}">
                                     <span class="icon">
                                         <i class="fas fa-sort-alpha-down-alt"></i>
                                     </span>
                                     {{ "column.#{column.name}"|trans({}, name) }}
                                 </a>
                             {% else %}
-                                <a class="has-text-dark" href="{{ path("#{route}sort_field", { 'field': sortName, 'order' : 'asc' }) }}">
+                                <a class="has-text-dark" href="{{ path("sort_field", { 'route': app.request.get('_route'), 'field': sortName, 'order' : 'asc' }) }}">
                                     <span class="icon">
                                         <i class="fas fa-sort"></i>
                                     </span>
@@ -232,13 +193,13 @@
 
     <div class="columns">
         <div class="column is-12-mobile is-9-tablet is-10-desktop">
-            {% include "#{name}/_pagination.html.twig" with { 'pagination': paginationData, 'count': items.count, 'route': route } only %}
+            {% include "#{name}/_pagination.html.twig" with { 'pagination': paginationData, 'count': items|length, 'route': app.request.get('_route') } only %}
         </div>
         <div class="column is-12-mobile is-3-tablet is-2-desktop">
             <div class="select is-fullwidth">
                 <select onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">
                     {% for i in range(5, 50, 5) %}
-                        <option value="{{ path("#{route}paginate", {'field': 'limit', 'value': i}) }}" {{ i == paginationData.limit ? 'selected' : null }}>{{ i }}</option>
+                        <option value="{{ path("paginate", {'route': app.request.get('_route'), 'field': 'limit', 'value': i}) }}" {{ i == paginationData.limit ? 'selected' : null }}>{{ i }}</option>
                     {% endfor %}
                 </select>
             </div>

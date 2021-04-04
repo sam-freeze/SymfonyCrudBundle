@@ -31,12 +31,12 @@
         {% set firstLoop = firstPage %}
     {% endif %}
 
-    <a class="pagination-previous" href="{{ path("#{route}paginate", {'field': 'page', 'value': previousPage > 1 ? previousPage : 1}) }}">
+    <a class="pagination-previous" href="{{ path("paginate", {'route': route, 'field': 'page', 'value': previousPage > 1 ? previousPage : 1}) }}">
         <span class="icon is-small">
             <i class="fas fa-chevron-left"></i>
         </span>
     </a>
-    <a class="pagination-next" href="{{ path("#{route}paginate", {'field': 'page', 'value': nextPage > lastPage ? lastPage : nextPage}) }}">
+    <a class="pagination-next" href="{{ path("paginate", {'route': route, 'field': 'page', 'value': nextPage > lastPage ? lastPage : nextPage}) }}">
         <span class="icon is-small">
             <i class="fas fa-chevron-right"></i>
         </span>
@@ -44,17 +44,17 @@
 
     <ul class="pagination-list">
         <li><a class="pagination-link {{ firstPage == page ? "is-current" : "" }}"
-                href="{{ path("#{route}paginate", {'field': 'page', 'value': firstPage}) }}"
+                href="{{ path("paginate", {'route': route, 'field': 'page', 'value': firstPage}) }}"
             >{{ firstPage }}</a></li>
         <li><span class="pagination-ellipsis">&hellip;</span></li>
         {% for i in range(firstLoop, lastLoop) %}
             <li><a class="pagination-link {{ i == page ? "is-current" : "" }}"
-                    href="{{ path("#{route}paginate", {'field': 'page', 'value': i}) }}"
+                    href="{{ path("paginate", {'route': route, 'field': 'page', 'value': i}) }}"
                 >{{ i }}</a></li>
         {% endfor %}
         <li><span class="pagination-ellipsis">&hellip;</span></li>
         <li><a class="pagination-link {{ lastPage == page ? "is-current" : "" }}"
-                href="{{ path("#{route}paginate", {'field': 'page', 'value': lastPage}) }}"
+                href="{{ path("paginate", {'route': route, 'field': 'page', 'value': lastPage}) }}"
             >{{ lastPage }}</a></li>
     </ul>
 </nav>
