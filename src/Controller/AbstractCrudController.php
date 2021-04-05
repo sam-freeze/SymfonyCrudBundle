@@ -28,24 +28,20 @@
 		protected $repository;
 		
 		protected $service;
-		
-		protected $route;
-		
-		protected $name;
+
+		protected $domain;
 		
 		function __construct(
 			TranslatorInterface $translator,
 			AbstractCrudService $service,
 			AbstractRepository $repository,
-			$route,
-			$name
+			$domain
 		)
 		{
 			$this->translator = $translator;
 			$this->repository = $repository;
 			$this->service = $service;
-			$this->route = $route;
-			$this->name = $name;
+			$this->domain = $domain;
 		}
 		
 		/**
@@ -65,21 +61,11 @@
 		abstract function getColumns();
 		
 		/**
-		 * get name
+		 * get domain
 		 * @return mixed
 		 */
-		protected function getName()
-		{
-			return $this->name;
-		}
-		
-		/**
-		 * get route
-		 * @return mixed
-		 */
-		protected function getRoute()
-		{
-			return $this->route;
+		protected function getDomain() {
+			return $this->domain;
 		}
 		
 		/**
@@ -87,8 +73,8 @@
 		 */
 		protected function trans($key, $group = 'admin')
 		{
-			$name = $this->getName();
-			return $this->translator->trans("$group.$key", [], $name);
+			$domain = $this->getDomain();
+			return $this->translator->trans("$group.$key", [], $domain);
 		}
 		
 		/**
@@ -105,35 +91,34 @@
 		}
 		
 		/**
-		 * @Route("", name="index", methods="GET")
+		 * @Route("", name="_index", methods="GET")
 		 */
 		public function index(Request $request, EntityManagerInterface $entityManager): Response
 		{
-			$name = $this->getName();
-			$route = $this->getRoute();
-			
+			$route = $request->attributes->get('_route');
+			$domain = $this->getDomain();
 			$columns = $this->getColumns();
 			
 			$user = $this->getUser()->getId();
-			$routeName = $request->attributes->get('_route');
-			$paginationData = $this->service->findRoutePagination($routeName, $user);
-			$searchData = $this->service->findRouteSearchValue($routeName, $user);
-			$operatorData= $this->service->findRouteSearchOperator($routeName, $user);
-			$sortData = $this->service->findRouteSort($routeName, $user);
-			$columnData = $this->service->findRouteColumn($routeName, $user);
+			
+			$paginationData = $this->service->findRoutePagination($route, $user);
+			$searchData = $this->service->findRouteSearchValue($route, $user);
+			$operatorData = $this->service->findRouteSearchOperator($route, $user);
+			$sortData = $this->service->findRouteSort($route, $user);
+			$columnData = $this->service->findRouteColumn($route, $user);
 			
 			if (!array_key_exists('page', $paginationData)) {
 				$paginationData['page'] = 1;
 			}
-	
+			
 			if (!array_key_exists('limit', $paginationData)) {
 				$paginationData['limit'] = 5;
 			}
 			
-			return $this->render("{$name}/index.html.twig", [
+			return $this->render("{$domain}/index.html.twig", [
 				'items' => $this->searchData($searchData, $operatorData, $sortData, $paginationData),
 				'columns' => $columns,
-				'dColumns' => array_filter($columns, function($column) use ($columnData) {
+				'dColumns' => array_filter($columns, function ($column) use ($columnData) {
 					$name = $column['name'];
 					return isset($columnData[$name]) && $columnData[$name] > 0;
 				}),
@@ -142,13 +127,12 @@
 				'searchData' => $searchData,
 				'searchOperatorData' => $operatorData,
 				'paginationData' => $paginationData,
-				'route' => $route,
-				'name' => $name,
+				'domain' => $domain,
 			]);
 		}
 		
 		/**
-		 * @Route("/new", name="new", methods="GET|POST")
+		 * @Route("/new", name="_new", methods="GET|POST")
 		 */
 		public function new(Request $request): Response
 		{
@@ -158,7 +142,7 @@
 		}
 		
 		/**
-		 * @Route("/{id}/edit", name="edit", methods="GET|POST")
+		 * @Route("/{id}/edit", name="_edit", methods="GET|POST")
 		 */
 		public function edit(Request $request, $id): Response
 		{
@@ -166,7 +150,7 @@
 			
 			if (!$item) {
 				$this->addFlash('error', $this->trans('notfound'));
-				$route = $this->getRoute();
+				$route = $this->getDomain();
 				return $this->redirectToRoute("{$route}index");
 			}
 			
@@ -183,10 +167,9 @@
 		 */
 		protected function generateForm($request, $formType, $item)
 		{
+			$domain = $this->getDomain();
 			$classNamespace = explode('\\', get_class($item));
 			$className = array_pop($classNamespace);
-			$title = $this->getName();
-			$route = $this->getRoute();
 			$form = $this->createForm($formType, $item);
 			
 			$oldData = [];
@@ -231,8 +214,8 @@
 					$em->persist($item);
 					$em->flush();
 					
-					$this->addFlash('notice', $this->trans('saved'));
-					return $this->redirectToRoute("{$route}index");
+					$this->addFlash('notice', $this->trans('saved', 'admin', $domain));
+					return $this->redirectToRoute("{$domain}_index");
 				} else {
 					foreach ($form->getErrors() as $error) {
 						$this->addFlash('error', $error->getMessage());
@@ -240,16 +223,15 @@
 				}
 			}
 			
-			return $this->render("{$title}/edit.html.twig", [
+			return $this->render("{$domain}/edit.html.twig", [
 				'item' => $item,
 				'form' => $form->createView(),
-				'route' => $route,
-				'name' => $title,
+				'domain' => $domain
 			]);
 		}
 		
 		/**
-		 * @Route("/{id}/{field}/delete", name="delete_image", methods="GET")
+		 * @Route("/{id}/{field}/delete", name="_delete_image", methods="GET")
 		 */
 		public function deleteImage(
 			Request $request,
@@ -259,11 +241,11 @@
 		): Response
 		{
 			$item = $this->repository->findOneBy(['id' => $id]);
-			$route = $this->getRoute();
+			$domain = $this->getDomain();
 			
 			if (!$item) {
 				$this->addFlash('error', $this->trans('notfound'));
-				return $this->redirectToRoute("{$route}index");
+				return $this->redirectToRoute("{$domain}index");
 			}
 			
 			$getFunc = "get$field";
@@ -280,11 +262,11 @@
 			
 			$this->addFlash('notice', $this->trans('imageDeleted'));
 			
-			return $this->redirectToRoute("{$this->route}index");
+			return $this->redirectToRoute("{$domain}index");
 		}
 		
 		/**
-		 * @Route("/{id}/delete", name="delete", methods="GET")
+		 * @Route("/{id}/delete", name="_delete", methods="GET")
 		 */
 		public function delete(
 			Request $request,
@@ -292,11 +274,12 @@
 			$id
 		): Response
 		{
+			$domain = $this->getDomain();
 			$item = $this->repository->findOneBy(['id' => $id]);
 			
 			if (!$item) {
 				$this->addFlash('error', $this->trans('notfound'));
-				return $this->redirectToRoute("{$this->route}index");
+				return $this->redirectToRoute("{$domain}index");
 			}
 			
 			$entityManager->remove($item);
@@ -304,6 +287,6 @@
 			
 			$this->addFlash('notice', $this->trans('deleted'));
 			
-			return $this->redirectToRoute("{$this->route}index");
+			return $this->redirectToRoute("{$domain}index");
 		}
 	}
