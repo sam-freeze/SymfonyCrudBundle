@@ -1,18 +1,18 @@
-{% extends "#{name}.html.twig" %}
+{% extends "#{domain}.html.twig" %}
 
-{% block title %}{% if item.id %} {{ "admin.edit"|trans({}, name) }} {% else %} {{ "admin.create"|trans({}, name) }} {% endif %}{% endblock %}
+{% block title %}{% if item.id %} {{ "admin.edit"|trans({}, domain) }} {% else %} {{ "admin.create"|trans({}, domain) }} {% endif %}{% endblock %}
 
 {% block breadcrumb %}
-    <li><a href="{{ path("#{route}index") }}">{{ "admin.hero"|trans({}, name) }}</a></li>
+    <li><a href="{{ path("#{domain}_index") }}">{{ "admin.hero"|trans({}, domain) }}</a></li>
     {% if item.id %} 
-        <li><a class="is-active">{{ "admin.edit"|trans({}, name) }}</a></li>
+        <li><a class="is-active">{{ "admin.edit"|trans({}, domain) }}</a></li>
     {% else %}
-        <li><a class="is-active">{{ "admin.create"|trans({}, name) }}</a></li>
+        <li><a class="is-active">{{ "admin.create"|trans({}, domain) }}</a></li>
     {% endif %}
 {% endblock %}
 
 {% block body %}
 
-    {% include "#{name}/_form.html.twig" %}
+    {% include "#{domain}/_form.html.twig" %}
 
 {% endblock %}

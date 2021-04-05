@@ -48,7 +48,7 @@
     <div class="buttons">
         <a class="button open-modal" href="{{ '#' ~ uniqkey ~ id }}">
             <figure class="image is-16x16">
-                <img src="{{ asset(value) }}" />
+                <img src="{{ asset(value) | imagine_filter('16x16') }}" />
             </figure>
         </a>
         <a class="button" href="{{ path("#{route}delete_image", {'id': item.id, 'field': field}) }}">
@@ -73,7 +73,7 @@
 {% elseif column.type == 'image' %}
     <a class="open-modal" href="{{ '#' ~ uniqkey ~ id }}">
         <figure class="image is-64x64">
-            <img src="{{ asset(value) }}" />
+            <img src="{{ asset(value) | imagine_filter('64x64') }}" />
         </figure>
     </a>
     <div class="modal" id="{{ uniqkey ~ id }}">
@@ -93,9 +93,9 @@
     {{ value | format_currency }}
 {% elseif column.type == 'boolean' %}
     {% if value %}
-        {{ "admin.yes"|trans({}, name) }}
+        {{ "admin.yes"|trans({}, domain) }}
     {% else %}
-        {{ "admin.no"|trans({}, name) }}
+        {{ "admin.no"|trans({}, domain) }}
     {% endif %}
 {% elseif column.type == 'list' %}
     {% set lastAttribute = column.attributes|last %}
@@ -105,7 +105,7 @@
         {% endfor %}
         {% if value|length > 3 %}
             <a class="tag is-link open-modal" href="{{ '#' ~ uniqkey ~ id }}">
-                {{ value|length - 3 }} {{ "admin.more"|trans({}, name) }}
+                {{ value|length - 3 }} {{ "admin.more"|trans({}, domain) }}
             </a>
             <div class="modal" id="{{ uniqkey ~ id }}">
                 <div class="modal-background"></div>

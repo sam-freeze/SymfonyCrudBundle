@@ -1,9 +1,9 @@
-{% extends "#{name}.html.twig" %}
+{% extends "#{domain}.html.twig" %}
 
-{% block name %}{{ "admin.hero"|trans({}, name) }}{% endblock %}
+{% block name %}{{ "admin.hero"|trans({}, domain) }}{% endblock %}
 
 {% block breadcrumb %}
-    <li><a class="is-active">{{ "admin.hero"|trans({}, name) }}</a></li>
+    <li><a class="is-active">{{ "admin.hero"|trans({}, domain) }}</a></li>
 {% endblock %}
 
 {% block body %}
@@ -24,14 +24,14 @@
                                 <span class="icon">
                                     <i class="far fa-check-square"></i>
                                 </span>
-                                <span>{{ "column.#{column.name}"|trans({}, name) }}</span>
+                                <span>{{ "column.#{column.name}"|trans({}, domain) }}</span>
                             </a>
                         {% else %}
                             <a class="dropdown-item" href="{{ path("column", { 'route': app.request.get('_route'), 'field': column.name, 'value' : 1 }) }}">
                                 <span class="icon">
                                     <i class="far fa-square"></i>
                                 </span>
-                                <span>{{ "column.#{column.name}"|trans({}, name) }}</span>
+                                <span>{{ "column.#{column.name}"|trans({}, domain) }}</span>
                             </a>
                         {% endif %}
                     {% endfor %}
@@ -73,28 +73,28 @@
                                     <span class="icon">
                                         <i class="fas fa-sort"></i>
                                     </span>
-                                    {{ "column.#{column.name}"|trans({}, name) }}
+                                    {{ "column.#{column.name}"|trans({}, domain) }}
                                 </a>
                             {% elseif sortData[sortName] == 'asc' %}
                                 <a class="has-text-dark" href="{{ path("sort_field", { 'route': app.request.get('_route'), 'field': sortName, 'order' : 'desc' }) }}">
                                     <span class="icon">
                                         <i class="fas fa-sort-alpha-up"></i>
                                     </span>
-                                    {{ "column.#{column.name}"|trans({}, name) }}
+                                    {{ "column.#{column.name}"|trans({}, domain) }}
                                 </a>
                             {% elseif sortData[sortName] == 'desc' %}
                                 <a class="has-text-dark" href="{{ path("sort_reset_field", { 'route': app.request.get('_route'), 'field': sortName }) }}">
                                     <span class="icon">
                                         <i class="fas fa-sort-alpha-down-alt"></i>
                                     </span>
-                                    {{ "column.#{column.name}"|trans({}, name) }}
+                                    {{ "column.#{column.name}"|trans({}, domain) }}
                                 </a>
                             {% else %}
                                 <a class="has-text-dark" href="{{ path("sort_field", { 'route': app.request.get('_route'), 'field': sortName, 'order' : 'asc' }) }}">
                                     <span class="icon">
                                         <i class="fas fa-sort"></i>
                                     </span>
-                                    {{ "column.#{column.name}"|trans({}, name) }}
+                                    {{ "column.#{column.name}"|trans({}, domain) }}
                                 </a>
                             {% endif %}
                         </th>
@@ -121,28 +121,28 @@
                                     <span class="icon">
                                         <i class="fas fa-sort"></i>
                                     </span>
-                                    {{ "column.#{column.name}"|trans({}, name) }}
+                                    {{ "column.#{column.name}"|trans({}, domain) }}
                                 </a>
                             {% elseif sortData[sortName] == 'asc' %}
                                 <a class="has-text-dark" href="{{ path("sort_field", { 'route': app.request.get('_route'), 'field': sortName, 'order' : 'desc' }) }}">
                                     <span class="icon">
                                         <i class="fas fa-sort-alpha-up"></i>
                                     </span>
-                                    {{ "column.#{column.name}"|trans({}, name) }}
+                                    {{ "column.#{column.name}"|trans({}, domain) }}
                                 </a>
                             {% elseif sortData[sortName] == 'desc' %}
                                 <a class="has-text-dark" href="{{ path("sort_reset_field", { 'route': app.request.get('_route'), 'field': sortName }) }}">
                                     <span class="icon">
                                         <i class="fas fa-sort-alpha-down-alt"></i>
                                     </span>
-                                    {{ "column.#{column.name}"|trans({}, name) }}
+                                    {{ "column.#{column.name}"|trans({}, domain) }}
                                 </a>
                             {% else %}
                                 <a class="has-text-dark" href="{{ path("sort_field", { 'route': app.request.get('_route'), 'field': sortName, 'order' : 'asc' }) }}">
                                     <span class="icon">
                                         <i class="fas fa-sort"></i>
                                     </span>
-                                    {{ "column.#{column.name}"|trans({}, name) }}
+                                    {{ "column.#{column.name}"|trans({}, domain) }}
                                 </a>
                             {% endif %}
                         </th>
@@ -169,7 +169,7 @@
                         <tr>
                             {% for column in dColumns %}
                                 <td>
-                                    {% include "#{name}/_value.html.twig" with { 'value': item, 'column': column } %}
+                                    {% include "#{domain}/_value.html.twig" with { 'value': item, 'column': column } %}
                                 </td>
                             {% endfor %}
                             <td>
@@ -183,7 +183,7 @@
                 {% else %}
                     <tr>
                         <td colspan="{{ dColumns|length + 1 }}" class="has-text-centered has-text-primary">
-                            {{ "admin.noresult"|trans({}, name) }}
+                            {{ "admin.noresult"|trans({}, domain) }}
                         </td>
                     </tr>
                 {% endif %}
@@ -193,7 +193,7 @@
 
     <div class="columns">
         <div class="column is-12-mobile is-9-tablet is-10-desktop">
-            {% include "#{name}/_pagination.html.twig" with { 'pagination': paginationData, 'count': items|length, 'route': app.request.get('_route') } only %}
+            {% include "#{domain}/_pagination.html.twig" with { 'pagination': paginationData, 'count': items|length, 'route': app.request.get('_route') } only %}
         </div>
         <div class="column is-12-mobile is-3-tablet is-2-desktop">
             <div class="select is-fullwidth">
