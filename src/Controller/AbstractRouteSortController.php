@@ -32,7 +32,7 @@
 		
 		/**
 		 * reset sorting
-		 * @Route("/{route}/reset", name="reset", methods="GET")
+		 * @Route("/{route}/reset", name="sort_reset", methods="GET")
 		 */
 		public function resetSort(
 			EntityManagerInterface $entityManager,
@@ -57,7 +57,7 @@
 		
 		/**
 		 * reset sorting field
-		 * @Route("/{route}/{field}/reset", name="reset_field", methods="GET")
+		 * @Route("/{route}/{field}/reset", name="sort_reset_field", methods="GET")
 		 */
 		public function resetFieldSorting(
 			EntityManagerInterface $entityManager,
@@ -81,7 +81,7 @@
 		
 		/**
 		 * set sorting field
-		 * @Route("/{route}/{field}/{order}", name="field", methods="GET")
+		 * @Route("/{route}/{field}/{order}", name="sort_field", methods="GET")
 		 */
 		public function sortField(
 			EntityManagerInterface $entityManager,
