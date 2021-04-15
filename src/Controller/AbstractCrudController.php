@@ -120,7 +120,12 @@
 				'columns' => $columns,
 				'dColumns' => array_filter($columns, function ($column) use ($columnData) {
 					$name = $column['name'];
-					return isset($columnData[$name]) && $columnData[$name] > 0;
+
+					if (count($columnData) > 0) {
+						return isset($columnData[$name]) && $columnData[$name] > 0;
+					}
+
+					return isset($column['display']) && $column['display'];
 				}),
 				'sortData' => $sortData,
 				'columnData' => $columnData,
