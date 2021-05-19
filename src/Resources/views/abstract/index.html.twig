@@ -7,55 +7,60 @@
 {% endblock %}
 
 {% block body %}
-    <div class="has-text-right has-margin-bottom-10">
-        <div class="dropdown is-right is-hoverable">
-            <div class="dropdown-trigger">
-                <a class="button">
-                    <span class="icon is-small">
-                        <i class="fas fa-columns"></i>
-                    </span>
-                </a>
-            </div>
-            <div class="dropdown-menu">
-                <div class="dropdown-content has-text-left">
-                    {% for column in columns %}
-                        {% if column in dColumns %}
-                            <a class="dropdown-item" href="{{ path("column", { 'route': app.request.get('_route'), 'field': column.name, 'value' : 0 }) }}">
-                                <span class="icon">
-                                    <i class="far fa-check-square"></i>
-                                </span>
-                                <span>{{ "column.#{column.name}"|trans({}, domain) }}</span>
-                            </a>
-                        {% else %}
-                            <a class="dropdown-item" href="{{ path("column", { 'route': app.request.get('_route'), 'field': column.name, 'value' : 1 }) }}">
-                                <span class="icon">
-                                    <i class="far fa-square"></i>
-                                </span>
-                                <span>{{ "column.#{column.name}"|trans({}, domain) }}</span>
-                            </a>
-                        {% endif %}
-                    {% endfor %}
+    <div class="columns is-mobile is-vcentered">
+        <div class="column">
+            <p class="subtitle">{{ "admin.hero"|trans({}, domain) }}</p>
+        </div>
+        <div class="column has-text-right">
+            <div class="dropdown is-right is-hoverable">
+                <div class="dropdown-trigger">
+                    <a class="button">
+                        <span class="icon is-small">
+                            <i class="fas fa-columns"></i>
+                        </span>
+                    </a>
+                </div>
+                <div class="dropdown-menu">
+                    <div class="dropdown-content has-text-left">
+                        {% for column in columns %}
+                            {% if column in dColumns %}
+                                <a class="dropdown-item" href="{{ path("column", { 'route': app.request.get('_route'), 'field': column.name, 'value' : 0 }) }}">
+                                    <span class="icon">
+                                        <i class="far fa-check-square"></i>
+                                    </span>
+                                    <span>{{ "column.#{column.name}"|trans({}, domain) }}</span>
+                                </a>
+                            {% else %}
+                                <a class="dropdown-item" href="{{ path("column", { 'route': app.request.get('_route'), 'field': column.name, 'value' : 1 }) }}">
+                                    <span class="icon">
+                                        <i class="far fa-square"></i>
+                                    </span>
+                                    <span>{{ "column.#{column.name}"|trans({}, domain) }}</span>
+                                </a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
+            {% set searchKeys = searchData|filter(v => v is not empty)|map((v, k) => k) %}
+            {% set requiredOperator = ['isNull', 'isNotNull'] %}
+            {% set searchOperatorKeys = searchOperatorData|filter((v, k) => v in requiredOperator)|map((v, k) => k) %}
+            {% if searchKeys|length or searchOperatorKeys|length %}
+                <a class="button is-primary is-outlined">
+                    <span class="icon is-small">
+                        <i class="fas fa-filter"></i>
+                    </span>
+                </a>
+            {% else %}
+                <a class="button">
+                    <span class="icon is-small">
+                        <i class="fas fa-filter"></i>
+                    </span>
+                </a>
+            {% endif %}
+            {% block head_btn %}
+            {% endblock %}
         </div>
-        {% set searchKeys = searchData|filter(v => v is not empty)|map((v, k) => k) %}
-        {% set requiredOperator = ['isNull', 'isNotNull'] %}
-        {% set searchOperatorKeys = searchOperatorData|filter((v, k) => v in requiredOperator)|map((v, k) => k) %}
-        {% if searchKeys|length or searchOperatorKeys|length %}
-            <a class="button is-primary is-outlined">
-                <span class="icon is-small">
-                    <i class="fas fa-filter"></i>
-                </span>
-            </a>
-        {% else %}
-            <a class="button">
-                <span class="icon is-small">
-                    <i class="fas fa-filter"></i>
-                </span>
-            </a>
-        {% endif %}
-        {% block head_btn %}
-        {% endblock %}
     </div>
 
 
