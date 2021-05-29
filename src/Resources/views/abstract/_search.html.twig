@@ -1,0 +1,54 @@
+{{ form_start(form) }}
+<tr>
+    {% for column in columns %}
+        {% set searchName = column.attributes|join('_') %}
+        {% set valueName = column.attributes|join('_') ~ '_value' %}
+        {% set operatorName = column.attributes|join('_') ~ '_operator' %}
+        {% if form[valueName] is defined and form[operatorName] is defined %}
+            <th>
+                <div class="field">
+                    <div class="control is-expanded">
+                        {{ form_widget(form[valueName]) }}
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="control">
+                        {{ form_widget(form[operatorName]) }}
+                    </div>
+                </div>
+            </th>
+        {% elseif form[operatorName] is defined %}
+            <th>
+                <div class="field">
+                    <div class="control">
+                        {{ form_widget(form[operatorName]) }}
+                    </div>
+                </div>
+            </th>
+        {% else %}
+            <th></th>
+        {% endif %}
+    {% endfor %}
+    
+    <th class="has-text-right">
+        <div class="field">
+            <div class="control">
+                <a href="{{ path("#{route}_search_remove") }}" class="button">
+                    <span class="icon is-small">
+                        <i class="fas fa-eraser"></i>
+                    </span>
+                </a>
+            </div>
+        </div>
+        <div class="field">
+            <div class="control">
+                <button type="submit" class="button">
+                    <span class="icon is-small">
+                        <i class="fas fa-search"></i>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </th>
+</tr>
+{{ form_end(form) }}

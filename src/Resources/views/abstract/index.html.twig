@@ -42,32 +42,20 @@
                     </div>
                 </div>
             </div>
-            {% set searchKeys = searchData|filter(v => v is not empty)|map((v, k) => k) %}
-            {% set requiredOperator = ['isNull', 'isNotNull'] %}
-            {% set searchOperatorKeys = searchOperatorData|filter((v, k) => v in requiredOperator)|map((v, k) => k) %}
-            {% if searchKeys|length or searchOperatorKeys|length %}
-                <a class="button is-primary is-outlined">
-                    <span class="icon is-small">
-                        <i class="fas fa-filter"></i>
-                    </span>
-                </a>
-            {% else %}
-                <a class="button">
-                    <span class="icon is-small">
-                        <i class="fas fa-filter"></i>
-                    </span>
-                </a>
-            {% endif %}
+            <a class="button">
+                <span class="icon is-small">
+                    <i class="fas fa-file-csv"></i>
+                </span>
+            </a>
             {% block head_btn %}
             {% endblock %}
         </div>
     </div>
 
-
-
     <div class="table-wrapper has-margin-bottom-10">
         <table class="table is-striped">
             <thead>
+                {# sorting #}
                 <tr>
                     {% for column in dColumns %}
                         <th>
@@ -114,6 +102,20 @@
                         </div>
                     </th>
                 </tr>
+                
+                {# search #}
+                {{
+                    render(
+                        controller(
+                            'App\\Controller\\RouteSearchController::index',
+                            {
+                                columns: dColumns,
+                                route: app.request.get('_route'),
+                                domain: domain
+                            }
+                        )
+                    )
+                }}
             </thead>
             <tfoot>
                 <tr>

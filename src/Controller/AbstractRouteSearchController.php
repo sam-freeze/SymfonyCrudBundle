@@ -6,6 +6,7 @@
 	use Doctrine\ORM\EntityManagerInterface;
 	use SamFreeze\SymfonyCrudBundle\Repository\Expr;
 	use SamFreeze\SymfonyCrudBundle\Repository\AbstractRouteSearchRepository;
+	use Symfony\Component\Translation\TranslatorInterface;
 	use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 	use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 	use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -21,10 +22,21 @@
 	{
 		
 		protected $routeSearchRepository;
+
+		protected $translator;
 		
-		function __construct(AbstractRouteSearchRepository $routeSearchRepository)
+		function __construct(TranslatorInterface $translator, AbstractRouteSearchRepository $routeSearchRepository)
 		{
+			$this->translator = $translator;
 			$this->routeSearchRepository = $routeSearchRepository;
+		}
+
+		/**
+		 * hook to translate key
+		 */
+		protected function trans($key, $group = 'admin', $domain)
+		{
+			return $this->translator->trans("$group.$key", [], $domain);
 		}
 		
 		/**
@@ -61,14 +73,14 @@
 		 * @param $route
 		 * @return Response
 		 */
-		public function search($columns, $route, $name)
+		public function index($columns, $route, $domain)
 		{
-			$data = $this->buildFormData($route);
+			$form = $this->generateSearchForm($columns, $route, $domain);
 			
-			$form = $this->generateSearchForm($columns, $data);
-			
-			return $this->render("{$name}/search.html.twig", [
+			return $this->render("{$domain}/_search.html.twig", [
 				'columns' => $columns,
+				'domain' => $domain,
+				'route' => $route,
 				'form' => $form->createView(),
 			]);
 		}
@@ -76,14 +88,15 @@
 		/**
 		 * post search form
 		 */
-		public function post(
+		public function search(
 			Request $request,
 			EntityManagerInterface $entityManager,
 			$columns,
-			$route
+			$route,
+			$domain
 		): Response
 		{
-			$form = $this->generateSearchForm($columns, $route);
+			$form = $this->generateSearchForm($columns, $route, $domain);
 			
 			$form->handleRequest($request);
 			
@@ -115,17 +128,40 @@
 			
 			return $this->redirectToRoute($route);
 		}
+
+		/**
+		 * remove search data
+		 */
+		public function remove(
+			Request $request,
+			EntityManagerInterface $entityManager,
+			$route
+		): Response
+		{
+			$routeSearchList = $this->routeSearchRepository->findBy([
+				'userId' => $this->getUser()->getId(),
+				'route' => $route
+			]);
+
+			foreach ($routeSearchList as $routeSearch) {
+				$entityManager->remove($routeSearch);
+			}
+
+			$entityManager->flush();	
+
+			return $this->redirectToRoute($route);
+		}
 		
 		/**
 		 * generateSearchForm
 		 * @param $data
 		 * @return \Symfony\Component\Form\FormInterface
 		 */
-		private function generateSearchForm($columns, $route)
+		private function generateSearchForm($columns, $route, $domain)
 		{
 			$data = $this->buildFormData($route);
 			$formBuilder = $this->createFormBuilder($data);
-			$formBuilder->setAction($this->generateUrl($route));
+			$formBuilder->setAction($this->generateUrl("{$route}_search"));
 			
 			foreach ($columns as $column) {
 				if (!isset($column['searchType'])) continue;
@@ -160,14 +196,14 @@
 						break;
 				}
 				
-				$searchOptions['label'] = $this->trans($searchLabel, 'column');
+				$searchOptions['label'] = $this->trans($searchLabel, 'column', $domain);
 				$searchOptions['required'] = false;
 				$searchOptions['attr'] = [
-					'placeholder' => $this->trans($searchLabel, 'column')
+					'placeholder' => $this->trans($searchLabel, 'column', $domain)
 				];
 				
 				$formBuilder->add(
-					$searchName,
+					"{$searchName}_value",
 					$searchType,
 					$searchOptions
 				);
@@ -175,18 +211,15 @@
 				// operator options
 				$operatorOptions = [
 					'choices' => array_combine(
-						array_map(function ($value) {
-							return $this->trans($value);
+						array_map(function ($value) use ($domain) {
+							return $this->trans($value, 'admin', $domain);
 						}, $operatorChoices),
 						$operatorChoices)
 				];
 				
-				$operatorName = "{$searchName}_operator";
-				$operatorType = ChoiceType::class;
-				
 				$formBuilder->add(
-					$operatorName,
-					$operatorType,
+					"{$searchName}_operator",
+					ChoiceType::class,
 					$operatorOptions
 				);
 			}

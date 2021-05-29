@@ -120,11 +120,11 @@
 				'columns' => $columns,
 				'dColumns' => array_filter($columns, function ($column) use ($columnData) {
 					$name = $column['name'];
-
+	
 					if (count($columnData) > 0) {
 						return isset($columnData[$name]) && $columnData[$name] > 0;
 					}
-
+	
 					return isset($column['display']) && $column['display'];
 				}),
 				'sortData' => $sortData,
@@ -134,6 +134,50 @@
 				'paginationData' => $paginationData,
 				'domain' => $domain,
 			]);
+		}
+
+		/**
+		 * @Route("/search", name="_index_search", methods="POST")
+		 */
+		public function indexSearch(): Response {
+			$domain = $this->getDomain();
+			$columns = $this->getColumns();
+			$route = "{$domain}_index";
+			$user = $this->getUser()->getId();
+			$columnData = $this->service->findRouteColumn($route, $user);
+
+			return $this->forward(
+				'App\Controller\RouteSearchController::search',
+				[
+					'route'  => $route,
+					'domain' => $domain,
+					'columns' => array_filter($columns, function ($column) use ($columnData) {
+						$name = $column['name'];
+		
+						if (count($columnData) > 0) {
+							return isset($columnData[$name]) && $columnData[$name] > 0;
+						}
+		
+						return isset($column['display']) && $column['display'];
+					}),
+				]
+			);
+		}
+
+		/**
+		 * @Route("/search/remove", name="_index_search_remove", methods="GET")
+		 */
+		public function indexSearchRemove(): Response {
+			$domain = $this->getDomain();
+			$route = "{$domain}_index";
+
+			return $this->forward(
+				'App\Controller\RouteSearchController::remove', 
+				[
+					'route'  => $route,
+					'domain' => $domain
+				]
+			);
 		}
 		
 		/**
