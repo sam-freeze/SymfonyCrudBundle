@@ -4,6 +4,7 @@
 	
 	use SamFreeze\SymfonyCrudBundle\Repository\AbstractRouteColumnRepository;
 	use SamFreeze\SymfonyCrudBundle\Repository\AbstractRoutePaginationRepository;
+	use SamFreeze\SymfonyCrudBundle\Repository\AbstractRouteSearchOperatorRepository;
 	use SamFreeze\SymfonyCrudBundle\Repository\AbstractRouteSearchRepository;
 	use SamFreeze\SymfonyCrudBundle\Repository\AbstractRouteSortRepository;
 	
@@ -17,6 +18,8 @@
 		
 		private $routeSearchRepository;
 		
+		private $routeSearchOperatorRepository;
+		
 		private $routeSortRepository;
 		
 		private $routePaginationRepository;
@@ -25,22 +28,20 @@
 		
 		public function __construct(
 			AbstractRouteSearchRepository $routeSearchRepository,
+			AbstractRouteSearchOperatorRepository $routeSearchOperatorRepository,
 			AbstractRouteSortRepository $routeSortRepository,
 			AbstractRoutePaginationRepository $routePaginationRepository,
 			AbstractRouteColumnRepository $routeColumnRepository)
 		{
 			$this->routeSearchRepository = $routeSearchRepository;
+			$this->routeSearchOperatorRepository = $routeSearchOperatorRepository;
 			$this->routePaginationRepository = $routePaginationRepository;
 			$this->routeSortRepository = $routeSortRepository;
 			$this->routeColumnRepository = $routeColumnRepository;
 		}
 		
-		private function findBy($repository, $criteria)
-		{
-			$items = $repository->findBy($criteria, [
-				'id' => 'asc'
-			]);
-			
+		private function generateKeyValue($items, $extension = '')
+		{	
 			$data = [];
 			
 			foreach ($items as $item) {
@@ -50,34 +51,54 @@
 			return $data;
 		}
 		
-		public function findRouteSearch($route, $user)
-		{
-			return $this->findBy($this->routeSearchRepository, ['route' => $route, 'userId' => $user]);
-		}
-		
 		public function findRouteSearchValue($route, $user)
 		{
-			return $this->routeSearchRepository->findValue(['route' => $route, 'userId' => $user]);
+			$items = $this->routeSearchRepository->findBy([
+				'route' => $route,
+				'userId' => $user
+			]);
+
+			return $this->generateKeyValue($items);
 		}
 		
 		public function findRouteSearchOperator($route, $user)
 		{
-			return $this->routeSearchRepository->findOperator(['route' => $route, 'userId' => $user]);
+			$items = $this->routeSearchOperatorRepository->findBy([
+				'route' => $route,
+				'userId' => $user
+			]);
+
+			return $this->generateKeyValue($items);
 		}
 		
 		public function findRouteSort($route, $user)
 		{
-			return $this->findBy($this->routeSortRepository, ['route' => $route, 'userId' => $user]);
+			$items = $this->routeSortRepository->findBy([
+				'route' => $route,
+				'userId' => $user
+			]);
+
+			return $this->generateKeyValue($items);
 		}
 		
 		public function findRoutePagination($route, $user)
 		{
-			return $this->findBy($this->routePaginationRepository, ['route' => $route, 'userId' => $user]);
+			$items = $this->routePaginationRepository->findBy([
+				'route' => $route,
+				'userId' => $user
+			]);
+
+			return $this->generateKeyValue($items);
 		}
 		
 		public function findRouteColumn($route, $user)
 		{
-			return $this->findBy($this->routeColumnRepository, ['route' => $route, 'userId' => $user]);
+			$items = $this->routeColumnRepository->findBy([
+				'route' => $route,
+				'userId' => $user
+			]);
+
+			return $this->generateKeyValue($items);
 		}
 		
 		

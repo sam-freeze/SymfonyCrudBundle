@@ -22,8 +22,8 @@ abstract class AbstractRouteSearchRepository extends ServiceEntityRepository
     	$qb = $this->createQueryBuilder('s')
 			->select('s');
     	
-    	$qb->where($qb->expr()->notLike('s.field', ':s_field'))
-			->setParameter('s_field', '%_operator');
+    	$qb->where($qb->expr()->like('s.field', ':s_field'))
+			->setParameter('s_field', '%_value');
     	
     	foreach ($criteria as $k => $v) {
 			$qb->andWhere($qb->expr()->eq("s.$k", ":s_$k"))

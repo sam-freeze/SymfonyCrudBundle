@@ -4,6 +4,7 @@
 	
 	
 	use Doctrine\ORM\EntityManagerInterface;
+	use SamFreeze\SymfonyCrudBundle\Repository\AbstractRouteSearchOperatorRepository;
 	use SamFreeze\SymfonyCrudBundle\Repository\Expr;
 	use SamFreeze\SymfonyCrudBundle\Repository\AbstractRouteSearchRepository;
 	use Symfony\Component\Translation\TranslatorInterface;
@@ -22,13 +23,19 @@
 	{
 		
 		protected $routeSearchRepository;
+		
+		protected $routeSearchOperatorRepository;
 
 		protected $translator;
 		
-		function __construct(TranslatorInterface $translator, AbstractRouteSearchRepository $routeSearchRepository)
+		function __construct(
+			TranslatorInterface $translator,
+			AbstractRouteSearchRepository $routeSearchRepository,
+			AbstractRouteSearchOperatorRepository $routeSearchOperatorRepository)
 		{
 			$this->translator = $translator;
 			$this->routeSearchRepository = $routeSearchRepository;
+			$this->routeSearchOperatorRepository = $routeSearchOperatorRepository;
 		}
 
 		/**
@@ -45,23 +52,37 @@
 		abstract function newRouteSearchEntity();
 		
 		/**
+		 * hook to generate a new search operator entity
+		 */
+		abstract function newRouteSearchOperatorEntity();
+		
+		/**
 		 * get user data from repository
 		 * @param $route
 		 * @return array
 		 */
 		private function buildFormData($route)
 		{
+			$data = [];
+			
+			// values data
 			$items = $this->routeSearchRepository->findBy([
 				'userId' => $this->getUser()->getId(),
 				'route' => $route
-			], [
-				'id' => 'asc'
 			]);
 			
-			$data = [];
+			foreach ($items as $item) {
+				$data["{$item->getField()}_value"] = $item->getValue();
+			}
+			
+			// operator data
+			$items = $this->routeSearchOperatorRepository->findBy([
+				'userId' => $this->getUser()->getId(),
+				'route' => $route
+			]);
 			
 			foreach ($items as $item) {
-				$data[$item->getField()] = $item->getValue();
+				$data["{$item->getField()}_operator"] = $item->getValue();
 			}
 			
 			return $data;
@@ -101,9 +122,10 @@
 			$form->handleRequest($request);
 			
 			if ($form->isSubmitted()) {
-				$searchData = $form->getData();
 				$user = $this->getUser();
+				$data = $form->getData();
 				
+				// clear route search
 				$routeSearchList = $this->routeSearchRepository->findBy([
 					'userId' => $this->getUser()->getId(),
 					'route' => $route
@@ -113,13 +135,40 @@
 					$entityManager->remove($routeSearch);
 				}
 				
-				foreach ($searchData as $key => $value) {
+				// clear route search operator
+				$routeSearchOperatorList = $this->routeSearchOperatorRepository->findBy([
+					'userId' => $this->getUser()->getId(),
+					'route' => $route
+				]);
+				
+				foreach ($routeSearchOperatorList as $routeSearchOperator) {
+					$entityManager->remove($routeSearchOperator);
+				}
+				
+				foreach ($columns as $column) {
+					if (!isset($column['searchType'])) continue;
+					
+					$attributes = $column['attributes'];
+					$searchName = join('_', $attributes);
+					
+					$value = isset($data["{$searchName}_value"]) ? $data["{$searchName}_value"] : null;
+
 					$entity = $this->newRouteSearchEntity();
 					$entity->setUserId($user->getId());
 					$entity->setRoute($route);
-					$entity->setField($key);
+					$entity->setField($searchName);
 					$entity->setValue($value);
 					
+					$entityManager->persist($entity);
+					
+					$value = isset($data["{$searchName}_operator"]) ? $data["{$searchName}_operator"] : null;
+						
+					$entity = $this->newRouteSearchOperatorEntity();
+					$entity->setUserId($user->getId());
+					$entity->setRoute($route);
+					$entity->setField($searchName);
+					$entity->setValue($value);
+						
 					$entityManager->persist($entity);
 				}
 				
@@ -138,6 +187,7 @@
 			$route
 		): Response
 		{
+			// clear route search
 			$routeSearchList = $this->routeSearchRepository->findBy([
 				'userId' => $this->getUser()->getId(),
 				'route' => $route
@@ -145,6 +195,16 @@
 
 			foreach ($routeSearchList as $routeSearch) {
 				$entityManager->remove($routeSearch);
+			}
+			
+			// clear route search operator
+			$routeSearchOperatorList = $this->routeSearchOperatorRepository->findBy([
+				'userId' => $this->getUser()->getId(),
+				'route' => $route
+			]);
+			
+			foreach ($routeSearchOperatorList as $routeSearchOperator) {
+				$entityManager->remove($routeSearchOperator);
 			}
 
 			$entityManager->flush();	

@@ -80,12 +80,11 @@ abstract class AbstractRepository extends ServiceEntityRepository
 		$join = [];
 		
 		foreach ($values as $key => $value) {
-			$operatorKey = "{$key}_operator";
 			$attributes = explode('_', $key);
 			$count = count($attributes);
 
-			if (!isset($operators[$operatorKey])) continue;
-			if (!$this->isValidValue($operators[$operatorKey], $value)) continue;
+			if (!isset($operators[$key])) continue;
+			if (!$this->isValidValue($operators[$key], $value)) continue;
 			
 			$parent = 'p';
 			
@@ -93,7 +92,7 @@ abstract class AbstractRepository extends ServiceEntityRepository
 				$child = $attributes[$i];
 
 				if ($i == $count - 1) {
-					switch ($operators[$operatorKey]) {
+					switch ($operators[$key]) {
 						case Expr::eq:
 							$qb->andWhere($qb->expr()->eq("$parent.$child", ":$parent$child"))
 								->setParameter("$parent$child", $value);
