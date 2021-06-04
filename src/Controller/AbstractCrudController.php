@@ -200,7 +200,7 @@
 			if (!$item) {
 				$this->addFlash('error', $this->trans('notfound'));
 				$route = $this->getDomain();
-				return $this->redirectToRoute("{$route}index");
+				return $this->redirectToRoute("{$route}_index");
 			}
 			
 			$formType = $this->getForm();
@@ -294,7 +294,7 @@
 			
 			if (!$item) {
 				$this->addFlash('error', $this->trans('notfound'));
-				return $this->redirectToRoute("{$domain}index");
+				return $this->redirectToRoute("{$domain}_index");
 			}
 			
 			$getFunc = "get$field";
@@ -311,7 +311,7 @@
 			
 			$this->addFlash('notice', $this->trans('imageDeleted'));
 			
-			return $this->redirectToRoute("{$domain}index");
+			return $this->redirectToRoute("{$domain}_index");
 		}
 		
 		/**
@@ -328,7 +328,7 @@
 			
 			if (!$item) {
 				$this->addFlash('error', $this->trans('notfound'));
-				return $this->redirectToRoute("{$domain}index");
+				return $this->redirectToRoute("{$domain}_index");
 			}
 			
 			$entityManager->remove($item);
@@ -336,6 +336,6 @@
 			
 			$this->addFlash('notice', $this->trans('deleted'));
 			
-			return $this->redirectToRoute("{$domain}index");
+			return $this->redirectToRoute("{$domain}_index");
 		}
 	}
