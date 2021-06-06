@@ -235,7 +235,7 @@
 				switch ($searchType) {
 					case ChoiceType::class:
 						$values = [
-							$this->trans('all') => ''
+							$this->trans('all', 'admin', $domain) => ''
 						];
 						
 						foreach ($this->repository->findDistinctValues($attributes) as $value) {
