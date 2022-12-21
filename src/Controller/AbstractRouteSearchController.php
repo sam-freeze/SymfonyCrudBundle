@@ -238,9 +238,11 @@
 							$this->trans('all', 'admin', $domain) => ''
 						];
 						
-						foreach ($this->repository->findDistinctValues($attributes) as $value) {
+						/*
+						foreach ($this->routeSearchRepository->findDistinctValues($attributes) as $value) {
 							$values[$value] = $value;
 						}
+						*/
 						
 						$searchOptions['choices'] = $values;
 						$operatorChoices = [Expr::eq, Expr::neq, Expr::isNull, Expr::isNotNull];
