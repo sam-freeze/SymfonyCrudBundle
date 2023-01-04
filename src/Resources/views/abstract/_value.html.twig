@@ -51,7 +51,7 @@
                 <img src="{{ asset(value) | imagine_filter('16x16') }}" />
             </figure>
         </a>
-        <a class="button" href="{{ path("#{route}delete_image", {'id': item.id, 'field': field}) }}">
+        <a class="button" href="{{ path("#{domain}_delete_image", {'id': item.id, 'field': field}) }}">
             <span class="icon is-small">
                 <i class="far fa-trash-alt"></i>
             </span>

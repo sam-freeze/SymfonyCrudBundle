@@ -133,6 +133,7 @@
 				'searchOperatorData' => $operatorData,
 				'paginationData' => $paginationData,
 				'domain' => $domain,
+				'route'  => $route,
 			]);
 		}
 
