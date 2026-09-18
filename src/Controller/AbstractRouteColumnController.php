@@ -4,7 +4,7 @@
 	
 	use Doctrine\ORM\EntityManagerInterface;
 	use SamFreeze\SymfonyCrudBundle\Repository\AbstractRouteColumnRepository;
-	use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+	use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 	use Symfony\Component\Routing\Annotation\Route;
 	use Symfony\Component\HttpFoundation\Response;
 	
@@ -12,7 +12,7 @@
 	 * Route column controller
 	 * Manage RouteColumn entity
 	 */
-	abstract class AbstractRouteColumnController extends Controller
+	abstract class AbstractRouteColumnController extends AbstractController
 	{
 		
 		protected $routeColumnRepository;

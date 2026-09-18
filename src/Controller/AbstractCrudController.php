@@ -9,7 +9,7 @@
 	use Symfony\Component\Translation\TranslatorInterface;
 	use SamFreeze\SymfonyCrudBundle\Repository\AbstractRepository;
 	use SamFreeze\SymfonyCrudBundle\Service\FileUploader;
-	use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+	use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 	use Symfony\Component\Form\Extension\Core\Type\FileType;
 	use Symfony\Component\HttpFoundation\File\UploadedFile;
 	use Symfony\Component\Routing\Annotation\Route;
@@ -20,7 +20,7 @@
 	 * Crud controller
 	 * create, read, update and delete a entity
 	 */
-	abstract class AbstractCrudController extends Controller
+	abstract class AbstractCrudController extends AbstractController
 	{
 		
 		protected $translator;

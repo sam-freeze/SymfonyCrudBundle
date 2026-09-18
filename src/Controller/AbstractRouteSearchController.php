@@ -8,7 +8,7 @@
 	use SamFreeze\SymfonyCrudBundle\Repository\Expr;
 	use SamFreeze\SymfonyCrudBundle\Repository\AbstractRouteSearchRepository;
 	use Symfony\Component\Translation\TranslatorInterface;
-	use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+	use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 	use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 	use Symfony\Component\Form\Extension\Core\Type\TextType;
 	use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -19,7 +19,7 @@
 	 * Crud controller
 	 * create, read, update and delete a entity
 	 */
-	abstract class AbstractRouteSearchController extends Controller
+	abstract class AbstractRouteSearchController extends AbstractController
 	{
 		
 		protected $routeSearchRepository;

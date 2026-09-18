@@ -5,7 +5,7 @@
 	
 	use Doctrine\ORM\EntityManagerInterface;
 	use SamFreeze\SymfonyCrudBundle\Repository\AbstractRoutePaginationRepository;
-	use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+	use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 	use Symfony\Component\Routing\Annotation\Route;
 	use Symfony\Component\HttpFoundation\Response;
 	
@@ -13,7 +13,7 @@
 	 * Route pagination
 	 * Manage RoutePagination entity
 	 */
-	abstract class AbstractRoutePaginationController extends Controller
+	abstract class AbstractRoutePaginationController extends AbstractController
 	{
 		
 		protected $repository;

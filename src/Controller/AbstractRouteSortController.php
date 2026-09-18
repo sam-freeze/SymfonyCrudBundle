@@ -6,7 +6,7 @@
 	use Doctrine\ORM\EntityManagerInterface;
 	use Symfony\Component\Translation\TranslatorInterface;
 	use SamFreeze\SymfonyCrudBundle\Repository\AbstractRouteSortRepository;
-	use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+	use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 	use Symfony\Component\Routing\Annotation\Route;
 	use Symfony\Component\HttpFoundation\Response;
 	use Symfony\Component\HttpFoundation\Request;
@@ -15,7 +15,7 @@
 	 * Route sort controller
 	 * Manage RouteSort entity
 	 */
-	abstract class AbstractRouteSortController extends Controller
+	abstract class AbstractRouteSortController extends AbstractController
 	{
 		
 		protected $repository;
