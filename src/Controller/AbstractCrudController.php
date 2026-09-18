@@ -12,7 +12,7 @@
 	use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 	use Symfony\Component\Form\Extension\Core\Type\FileType;
 	use Symfony\Component\HttpFoundation\File\UploadedFile;
-	use Symfony\Component\Routing\Annotation\Route;
+	use Symfony\Component\Routing\Attribute\Route;
 	use Symfony\Component\HttpFoundation\Response;
 	use Symfony\Component\HttpFoundation\Request;
 	
@@ -90,9 +90,7 @@
 			return $this->repository->search($searchData, $operatorData, $sortData, $paginationData);
 		}
 		
-		/**
-		 * @Route("", name="_index", methods="GET")
-		 */
+		#[Route('', name: '_index', methods: 'GET')]
 		public function index(Request $request, EntityManagerInterface $entityManager): Response
 		{
 			$route = $request->attributes->get('_route');
@@ -137,9 +135,7 @@
 			]);
 		}
 
-		/**
-		 * @Route("/search", name="_index_search", methods="POST")
-		 */
+		#[Route('/search', name: '_index_search', methods: 'POST')]
 		public function indexSearch(): Response {
 			$domain = $this->getDomain();
 			$columns = $this->getColumns();
@@ -165,9 +161,7 @@
 			);
 		}
 
-		/**
-		 * @Route("/search/remove", name="_index_search_remove", methods="GET")
-		 */
+		#[Route('/search/remove', name: '_index_search_remove', methods: 'GET')]
 		public function indexSearchRemove(): Response {
 			$domain = $this->getDomain();
 			$route = "{$domain}_index";
@@ -181,9 +175,7 @@
 			);
 		}
 		
-		/**
-		 * @Route("/new", name="_new", methods="GET|POST")
-		 */
+		#[Route('/new', name: '_new', methods: 'GET|POST')]
 		public function new(Request $request): Response
 		{
 			$entity = $this->getNewEntity();
@@ -191,9 +183,7 @@
 			return $this->generateForm($request, $formType, $entity);
 		}
 		
-		/**
-		 * @Route("/{id}/edit", name="_edit", methods="GET|POST")
-		 */
+		#[Route('/{id}/edit', name: '_edit', methods: 'GET|POST')]
 		public function edit(Request $request, $id): Response
 		{
 			$item = $this->repository->findOneBy(['id' => $id]);
@@ -280,9 +270,7 @@
 			]);
 		}
 		
-		/**
-		 * @Route("/{id}/{field}/delete", name="_delete_image", methods="GET")
-		 */
+		#[Route('/{id}/{field}/delete', name: '_delete_image', methods: 'GET')]
 		public function deleteImage(
 			Request $request,
 			EntityManagerInterface $entityManager,
@@ -315,9 +303,7 @@
 			return $this->redirectToRoute("{$domain}_index");
 		}
 		
-		/**
-		 * @Route("/{id}/delete", name="_delete", methods="GET")
-		 */
+		#[Route('/{id}/delete', name: '_delete', methods: 'GET')]
 		public function delete(
 			Request $request,
 			EntityManagerInterface $entityManager,

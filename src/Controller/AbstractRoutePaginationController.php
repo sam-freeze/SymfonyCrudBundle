@@ -6,7 +6,7 @@
 	use Doctrine\ORM\EntityManagerInterface;
 	use SamFreeze\SymfonyCrudBundle\Repository\AbstractRoutePaginationRepository;
 	use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-	use Symfony\Component\Routing\Annotation\Route;
+	use Symfony\Component\Routing\Attribute\Route;
 	use Symfony\Component\HttpFoundation\Response;
 	
 	/**
@@ -30,8 +30,8 @@
 		
 		/**
 		 * sort
-		 * @Route("/paginate/{route}/{field}/{value}", name="paginate", methods="GET")
 		 */
+		#[Route('/paginate/{route}/{field}/{value}', name: 'paginate', methods: 'GET')]
 		public function paginate(
 			EntityManagerInterface $entityManager,
 			$route,

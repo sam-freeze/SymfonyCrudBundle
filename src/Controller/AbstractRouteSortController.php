@@ -7,7 +7,7 @@
 	use Symfony\Component\Translation\TranslatorInterface;
 	use SamFreeze\SymfonyCrudBundle\Repository\AbstractRouteSortRepository;
 	use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-	use Symfony\Component\Routing\Annotation\Route;
+	use Symfony\Component\Routing\Attribute\Route;
 	use Symfony\Component\HttpFoundation\Response;
 	use Symfony\Component\HttpFoundation\Request;
 	
@@ -32,8 +32,8 @@
 		
 		/**
 		 * reset sorting
-		 * @Route("/{route}/reset", name="sort_reset", methods="GET")
 		 */
+		#[Route('/{route}/reset', name: 'sort_reset', methods: 'GET')]
 		public function resetSort(
 			EntityManagerInterface $entityManager,
 			$route
@@ -57,8 +57,8 @@
 		
 		/**
 		 * reset sorting field
-		 * @Route("/{route}/{field}/reset", name="sort_reset_field", methods="GET")
 		 */
+		#[Route('/{route}/{field}/reset', name: 'sort_reset_field', methods: 'GET')]
 		public function resetFieldSorting(
 			EntityManagerInterface $entityManager,
 			$route,
@@ -81,8 +81,8 @@
 		
 		/**
 		 * set sorting field
-		 * @Route("/{route}/{field}/{order}", name="sort_field", methods="GET")
 		 */
+		#[Route('/{route}/{field}/{order}', name: 'sort_field', methods: 'GET')]
 		public function sortField(
 			EntityManagerInterface $entityManager,
 			$route,

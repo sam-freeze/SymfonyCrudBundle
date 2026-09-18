@@ -5,7 +5,7 @@ namespace SamFreeze\SymfonyCrudBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Filesystem\Filesystem;
@@ -67,9 +67,7 @@ abstract class AbstractTranslationController extends AbstractController
 		return $this->translator->trans("{$title}.{$key}");
 	}
 
-	/**
-     * @Route("/", name="index", methods="GET|POST")
-     */
+	#[Route('/', name: 'index', methods: 'GET|POST')]
     public function index(Request $request, TranslatorInterface $translator): Response
     {
 		// file path
@@ -96,9 +94,7 @@ abstract class AbstractTranslationController extends AbstractController
 		]);
 	}
 
-	/**
-     * @Route("/new", name="new", methods="GET|POST")
-     */
+	#[Route('/new', name: 'new', methods: 'GET|POST')]
     public function new(Request $request, TranslatorInterface $translator): Response
     {
 		$locale = $translator->getLocale();
@@ -163,9 +159,7 @@ abstract class AbstractTranslationController extends AbstractController
 		]);
     }
 
-    /**
-     * @Route("/edit", name="edit", methods="GET|POST")
-     */
+    #[Route('/edit', name: 'edit', methods: 'GET|POST')]
     public function edit(Request $request, TranslatorInterface $translator): Response
     {
     	// file path

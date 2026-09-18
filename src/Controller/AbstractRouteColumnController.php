@@ -5,7 +5,7 @@
 	use Doctrine\ORM\EntityManagerInterface;
 	use SamFreeze\SymfonyCrudBundle\Repository\AbstractRouteColumnRepository;
 	use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-	use Symfony\Component\Routing\Annotation\Route;
+	use Symfony\Component\Routing\Attribute\Route;
 	use Symfony\Component\HttpFoundation\Response;
 	
 	/**
@@ -29,8 +29,8 @@
 		
 		/**
 		 * display column
-		 * @Route("/column/{route}/{field}/{value}", name="column", methods="GET")
 		 */
+		#[Route('/column/{route}/{field}/{value}', name: 'column', methods: 'GET')]
 		public function column(
 			EntityManagerInterface $entityManager,
 			$route,
