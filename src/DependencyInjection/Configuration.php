@@ -12,7 +12,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class Configuration implements ConfigurationInterface
 {
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         // TreeBuilder's no-arg constructor (relying on a separate ->root()
         // call) was removed in symfony/config 5.0 - the root name is now
