@@ -14,8 +14,9 @@ class Configuration implements ConfigurationInterface
 {
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $treeBuilder->root('symfony_crud');
-        return $treeBuilder;
+        // TreeBuilder's no-arg constructor (relying on a separate ->root()
+        // call) was removed in symfony/config 5.0 - the root name is now
+        // required directly in the constructor.
+        return new TreeBuilder('symfony_crud');
     }
 }
