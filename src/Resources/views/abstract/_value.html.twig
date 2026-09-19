@@ -3,18 +3,20 @@
 {% set uniqkey = '' %}
 {% set field = '' %}
 
-{% for attribute in column.attributes if continue %}
-    {% if value is empty %}
-        {% set continue = false %}
-        {% set value = '' %}
-    {% elseif value is iterable %}
-        {% set continue = false %}
-    {% else %}
-        {% set value = attribute(value, attribute) %}
-    {% endif %}
+{% for attribute in column.attributes %}
+    {% if continue %}
+        {% if value is empty %}
+            {% set continue = false %}
+            {% set value = '' %}
+        {% elseif value is iterable %}
+            {% set continue = false %}
+        {% else %}
+            {% set value = attribute(value, attribute) %}
+        {% endif %}
 
-    {% set uniqkey = uniqkey ~ attribute %}
-    {% set field = attribute %}
+        {% set uniqkey = uniqkey ~ attribute %}
+        {% set field = attribute %}
+    {% endif %}
 {% endfor %}
 
 {% if value is empty %}
