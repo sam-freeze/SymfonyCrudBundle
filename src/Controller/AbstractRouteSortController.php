@@ -4,7 +4,7 @@
 	
 	
 	use Doctrine\ORM\EntityManagerInterface;
-	use Symfony\Component\Translation\TranslatorInterface;
+	use Symfony\Contracts\Translation\TranslatorInterface;
 	use SamFreeze\SymfonyCrudBundle\Repository\AbstractRouteSortRepository;
 	use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 	use Symfony\Component\Routing\Attribute\Route;

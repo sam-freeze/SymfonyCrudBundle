@@ -6,7 +6,7 @@
 	use Doctrine\ORM\EntityManager;
 	use Doctrine\ORM\EntityManagerInterface;
 	use SamFreeze\SymfonyCrudBundle\Service\AbstractCrudService;
-	use Symfony\Component\Translation\TranslatorInterface;
+	use Symfony\Contracts\Translation\TranslatorInterface;
 	use SamFreeze\SymfonyCrudBundle\Repository\AbstractRepository;
 	use SamFreeze\SymfonyCrudBundle\Service\FileUploader;
 	use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

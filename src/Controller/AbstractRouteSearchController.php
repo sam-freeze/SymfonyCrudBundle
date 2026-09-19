@@ -7,7 +7,7 @@
 	use SamFreeze\SymfonyCrudBundle\Repository\AbstractRouteSearchOperatorRepository;
 	use SamFreeze\SymfonyCrudBundle\Repository\Expr;
 	use SamFreeze\SymfonyCrudBundle\Repository\AbstractRouteSearchRepository;
-	use Symfony\Component\Translation\TranslatorInterface;
+	use Symfony\Contracts\Translation\TranslatorInterface;
 	use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 	use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 	use Symfony\Component\Form\Extension\Core\Type\TextType;

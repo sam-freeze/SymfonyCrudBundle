@@ -3,7 +3,7 @@
 namespace SamFreeze\SymfonyCrudBundle\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method AbstractRouteSort|null find($id, $lockMode = null, $lockVersion = null)
@@ -13,7 +13,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  */
 class AbstractRouteSortRepository extends ServiceEntityRepository
 {
-    public function __construct(RegistryInterface $registry, $entity)
+    public function __construct(ManagerRegistry $registry, $entity)
     {
         parent::__construct($registry, $entity);
     }
