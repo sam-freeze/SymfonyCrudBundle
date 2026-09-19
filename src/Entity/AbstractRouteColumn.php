@@ -11,24 +11,16 @@ abstract class AbstractRouteColumn
      */
     protected $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
 	protected $route;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
 	protected $field;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
+    #[ORM\Column(type: "boolean", nullable: true)]
 	protected $value;
 	
-	/**
-	 * @ORM\Column(type="integer")
-	 */
+	#[ORM\Column(type: "integer")]
 	protected $userId;
 
     public function getId(): ?int
